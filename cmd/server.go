@@ -18,7 +18,7 @@ import (
 func main() {
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Warn("Coudn't load .env file")
+		log.Warn("Couldn't load .env file")
 	}
 
 	app := fx.New(
