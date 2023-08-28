@@ -1,0 +1,12 @@
+# bin
+bin/
+dist/
+
+# Node.js
+node_modules
+
+# Golang Prof
+prof/
+
+# Env
+.env
