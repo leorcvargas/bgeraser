@@ -15,6 +15,8 @@ import (
 	"go.uber.org/fx"
 )
 
+const finishProfAfter = 3 * time.Minute
+
 func startProfiling(config *config.Config) {
 	log.Infof(
 		"Starting CPU and Memory profiling on %s and %s",
@@ -26,25 +28,32 @@ func startProfiling(config *config.Config) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	pprof.StartCPUProfile(cpuProfFile)
+
+	if err = pprof.StartCPUProfile(cpuProfFile); err != nil {
+		log.Fatal(err)
+	}
 
 	memoryProfFile, err := os.Create(config.Profiling.Mem)
 	if err != nil {
 		log.Fatal(err)
 	}
-	pprof.WriteHeapProfile(memoryProfFile)
 
-	after := time.After(3 * time.Minute)
+	if err = pprof.WriteHeapProfile(memoryProfFile); err != nil {
+		log.Fatal(err)
+	}
+
+	after := time.After(finishProfAfter)
 
 	go func() {
 		<-after
 		log.Info("Stopping CPU and Memory profiling")
 		pprof.StopCPUProfile()
-		cpuProfFile.Close()
-		memoryProfFile.Close()
+		_ = cpuProfFile.Close()
+		_ = memoryProfFile.Close()
 	}()
 }
 
+// NewServer starts the fiber application.
 func NewServer(
 	lifecycle fx.Lifecycle,
 	router *fiber.App,

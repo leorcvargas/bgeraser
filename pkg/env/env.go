@@ -1,3 +1,5 @@
+// Package env exposes environment variable values through
+// the GetEnvOrDie function
 package env
 
 import (
@@ -9,7 +11,7 @@ func GetEnvOrDie(key string) string {
 	value := os.Getenv(key)
 
 	if value == "" {
-		err := fmt.Errorf("Missing environment variable %s", key)
+		err := fmt.Errorf("missing environment variable %s", key)
 		panic(err)
 	}
 

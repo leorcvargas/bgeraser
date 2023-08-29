@@ -1,3 +1,4 @@
+// domain.images database related logic
 package imagesdb
 
 import (
@@ -8,6 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// Database model related to entities.Image.
 type Model struct {
 	gorm.Model
 
@@ -18,6 +20,7 @@ type Model struct {
 	SavedAt          time.Time `gorm:"not null"`
 }
 
+// Image model database name.
 func (Model) TableName() string {
 	return "images"
 }

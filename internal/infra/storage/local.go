@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/leorcvargas/bgeraser/internal/infra/config"
 )
 
@@ -18,7 +19,13 @@ func (s *LocalImageStorage) Write(filename string, content []byte) error {
 	if err != nil {
 		return err
 	}
-	defer file.Close()
+
+	defer func() {
+		closeFileErr := file.Close()
+		if closeFileErr != nil {
+			log.Warn("error while trying to close the file")
+		}
+	}()
 
 	if _, err = file.Write(content); err != nil {
 		return err
@@ -27,8 +34,8 @@ func (s *LocalImageStorage) Write(filename string, content []byte) error {
 	return nil
 }
 
-func NewLocalImageStorage(config *config.Config) *LocalImageStorage {
+func NewLocalImageStorage(cfg *config.Config) *LocalImageStorage {
 	return &LocalImageStorage{
-		config: config,
+		config: cfg,
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// images.Repository implementation for Postgres.
 type PostgresImageRepository struct {
 	db *gorm.DB
 }

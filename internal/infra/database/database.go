@@ -1,3 +1,5 @@
+// Package database is responsible for all
+// database related code
 package database
 
 import (

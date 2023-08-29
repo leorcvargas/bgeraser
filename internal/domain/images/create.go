@@ -4,24 +4,24 @@ import (
 	"github.com/leorcvargas/bgeraser/internal/domain/entities"
 )
 
-type Create struct {
-	repository Repository
+type Create struct{}
+
+type CreateInput struct {
+	Filename string
+	Format   string
+	Size     int64
 }
 
-func (c *Create) Exec(filename string, format string, size int64) *entities.Image {
+func (c *Create) Exec(input CreateInput) *entities.Image {
 	image := entities.CreateImage(
-		filename,
-		format,
-		size,
+		input.Filename,
+		input.Format,
+		input.Size,
 	)
 
 	return image
 }
 
-func NewCreate(
-	repository Repository,
-) *Create {
-	return &Create{
-		repository: repository,
-	}
+func NewCreate() *Create {
+	return &Create{}
 }

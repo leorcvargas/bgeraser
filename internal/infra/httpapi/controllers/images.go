@@ -14,8 +14,8 @@ import (
 )
 
 var (
-	ErrInvalidFileType = errors.New("Invalid file type")
-	ErrFileTooLarge    = errors.New("File too large")
+	ErrInvalidFileType = errors.New("invalid file type")
+	ErrFileTooLarge    = errors.New("file too large")
 )
 
 type ImagesController struct {
@@ -36,7 +36,7 @@ func (i *ImagesController) Upload(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(ErrResponse{Message: "Missing files"})
 	}
 
-	var images []entities.Image
+	result := make([]entities.Image, 0)
 
 	for _, file := range files {
 		if err = i.validateUpload(file); err != nil {
@@ -45,25 +45,27 @@ func (i *ImagesController) Upload(c *fiber.Ctx) error {
 			})
 		}
 
-		image := i.create.Exec(
-			file.Filename,
-			file.Header["Content-Type"][0],
-			file.Size,
-		)
+		input := images.CreateInput{
+			Filename: file.Filename,
+			Format:   file.Header["Content-Type"][0],
+			Size:     file.Size,
+		}
+
+		image := i.create.Exec(input)
 
 		localPath := fmt.Sprintf("%s/%s", i.config.Storage.LocalPath, image.Filename())
-		if err = c.SaveFile(file, localPath); err != nil {
+		if err := c.SaveFile(file, localPath); err != nil {
 			return err
 		}
 
-		if err = i.save.Exec(image); err != nil {
+		if err := i.save.Exec(image); err != nil {
 			return err
 		}
 
-		images = append(images, *image)
+		result = append(result, *image)
 	}
 
-	return c.Status(http.StatusOK).JSON(Response{Data: images})
+	return c.Status(http.StatusOK).JSON(Response{Data: result})
 }
 
 func (i *ImagesController) validateUpload(formFile *multipart.FileHeader) error {
