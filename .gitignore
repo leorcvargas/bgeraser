@@ -10,3 +10,9 @@ prof/
 
 # Env
 .env
+
+# Python
+venv/
+
+# OS 
+.DS_Store
