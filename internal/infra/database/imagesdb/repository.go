@@ -5,7 +5,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// images.Repository implementation for Postgres.
 type PostgresImageRepository struct {
 	db *gorm.DB
 }
@@ -16,7 +15,6 @@ func (p *PostgresImageRepository) Save(image *entities.Image) error {
 		Format:           image.Format,
 		Size:             image.Size,
 		OriginalFilename: image.OriginalFilename,
-		SavedAt:          image.SavedAt,
 	}
 
 	return p.db.Create(model).Error

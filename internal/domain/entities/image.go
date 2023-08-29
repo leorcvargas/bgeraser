@@ -12,7 +12,6 @@ type Image struct {
 	Format           string    `json:"format"`
 	Size             int64     `json:"size"`
 	OriginalFilename string    `json:"originalFilename"`
-	SavedAt          time.Time `json:"savedAt"`
 	CreatedAt        time.Time `json:"createdAt"`
 	UpdatedAt        time.Time `json:"updatedAt"`
 	DeletedAt        time.Time `json:"deletedAt"`
@@ -56,7 +55,6 @@ func NewImage(
 		ID:        id,
 		Format:    format,
 		Size:      size,
-		SavedAt:   savedAt,
 		CreatedAt: createdAt,
 		UpdatedAt: updatedAt,
 		DeletedAt: deletedAt,
