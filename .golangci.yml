@@ -17,6 +17,9 @@ linters:
     - thelper # detects golang test helpers without t.Helper() call and checks consistency of test helpers
     - unconvert # removes unnecessary type conversions
     - unparam # removes unused function parameters
+    - gosimple
+    - govet
+    - staticcheck
   fast: true
 issues:
   exclude-rules:
