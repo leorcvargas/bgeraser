@@ -18,7 +18,8 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version: '1.21'
-          cache: ./go.sum
+          cache: true
+          cache-dependency-path: ./go.sum
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v3
         with:
