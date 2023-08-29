@@ -46,7 +46,6 @@ func NewImage(
 	id uuid.UUID,
 	format string,
 	size int64,
-	savedAt time.Time,
 	createdAt time.Time,
 	updatedAt time.Time,
 	deletedAt time.Time,
