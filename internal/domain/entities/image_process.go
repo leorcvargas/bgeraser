@@ -4,12 +4,13 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	domainerrors "github.com/leorcvargas/bgeraser/internal/domain/errors"
 )
 
 type ImageProcessKind string
 
 const (
-	RemoveBackground = ImageProcessKind("REMOVE_BACKGROUND")
+	ImageProcessKindRemoveBackground = ImageProcessKind("REMOVE_BACKGROUND")
 )
 
 type ImageProcess struct {
@@ -27,8 +28,15 @@ func (i *ImageProcess) SetError(err error) {
 	i.ErrorReason = err.Error()
 }
 
-func (i *ImageProcess) SetFinish() {
+func (i *ImageProcess) SetFinish(resultID uuid.UUID) error {
+	if resultID == uuid.Nil {
+		return domainerrors.ErrImageProcessEmptyResultID
+	}
+
 	i.FinishedAt = time.Now()
+	i.ResultID = resultID
+
+	return nil
 }
 
 func (i *ImageProcess) Failed() bool {
@@ -44,6 +52,7 @@ func CreateImageProcess(
 	kind ImageProcessKind,
 ) *ImageProcess {
 	return &ImageProcess{
+		ID:       uuid.New(),
 		OriginID: originID,
 		Kind:     kind,
 	}
