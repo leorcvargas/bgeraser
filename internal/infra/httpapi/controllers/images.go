@@ -9,6 +9,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/leorcvargas/bgeraser/internal/domain/entities"
+	domainerrors "github.com/leorcvargas/bgeraser/internal/domain/errors"
 	"github.com/leorcvargas/bgeraser/internal/domain/images"
 	"github.com/leorcvargas/bgeraser/internal/infra/config"
 )
@@ -19,9 +20,10 @@ var (
 )
 
 type ImagesController struct {
-	create *images.Create
-	save   *images.Save
-	config *config.Config
+	create        *images.Create
+	save          *images.Save
+	config        *config.Config
+	createProcess *images.CreateProcess
 }
 
 func (i *ImagesController) Upload(c *fiber.Ctx) error {
@@ -55,17 +57,43 @@ func (i *ImagesController) Upload(c *fiber.Ctx) error {
 
 		localPath := fmt.Sprintf("%s/%s", i.config.Storage.LocalPath, image.Filename())
 		if err := c.SaveFile(file, localPath); err != nil {
-			return err
+			return c.Status(http.StatusInternalServerError).JSON(InternalServerErrResponse)
 		}
 
 		if err := i.save.Exec(image); err != nil {
-			return err
+			return c.Status(http.StatusInternalServerError).JSON(InternalServerErrResponse)
 		}
 
 		result = append(result, *image)
 	}
 
 	return c.Status(http.StatusOK).JSON(Response{Data: result})
+}
+
+func (i *ImagesController) Process(c *fiber.Ctx) error {
+	id := c.Params("id")
+	kind := c.Params("kind")
+
+	if kind != "REMOVE_BACKGROUND" {
+		return c.Status(http.StatusBadRequest).JSON(ErrResponse{
+			Message: "Invalid kind",
+		})
+	}
+
+	process, err := i.createProcess.Exec(id, entities.ImageProcessKindRemoveBackground)
+	if err != nil {
+		if errors.Is(err, domainerrors.ErrImageNotFound) {
+			return c.Status(http.StatusNotFound).JSON(ErrResponse{
+				Message: err.Error(),
+			})
+		}
+
+		log.Errorf("Error creating process: %s", err.Error())
+
+		return c.Status(http.StatusInternalServerError).JSON(InternalServerErrResponse)
+	}
+
+	return c.Status(http.StatusOK).JSON(Response{Data: process})
 }
 
 func (i *ImagesController) validateUpload(formFile *multipart.FileHeader) error {
@@ -89,10 +117,12 @@ func NewImagesController(
 	config *config.Config,
 	create *images.Create,
 	save *images.Save,
+	createProcess *images.CreateProcess,
 ) *ImagesController {
 	return &ImagesController{
-		config: config,
-		create: create,
-		save:   save,
+		config:        config,
+		create:        create,
+		save:          save,
+		createProcess: createProcess,
 	}
 }

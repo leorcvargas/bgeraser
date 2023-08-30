@@ -14,13 +14,13 @@ const (
 )
 
 type ImageProcess struct {
-	ID          uuid.UUID
-	OriginID    uuid.UUID
-	ResultID    uuid.UUID
-	Kind        ImageProcessKind
-	FinishedAt  time.Time
-	ErroredAt   time.Time
-	ErrorReason string
+	ID          uuid.UUID        `json:"id,omitempty"`
+	ImageID     uuid.UUID        `json:"imageId,omitempty"`
+	ResultID    uuid.UUID        `json:"resultId,omitempty"`
+	Kind        ImageProcessKind `json:"kind,omitempty"`
+	FinishedAt  time.Time        `json:"finishedAt,omitempty"`
+	ErroredAt   time.Time        `json:"erroredAt,omitempty"`
+	ErrorReason string           `json:"errorReason,omitempty"`
 }
 
 func (i *ImageProcess) SetError(err error) {
@@ -48,19 +48,19 @@ func (i *ImageProcess) Finished() bool {
 }
 
 func CreateImageProcess(
-	originID uuid.UUID,
+	imageID uuid.UUID,
 	kind ImageProcessKind,
 ) *ImageProcess {
 	return &ImageProcess{
-		ID:       uuid.New(),
-		OriginID: originID,
-		Kind:     kind,
+		ID:      uuid.New(),
+		ImageID: imageID,
+		Kind:    kind,
 	}
 }
 
 func NewImageProcess(
 	id uuid.UUID,
-	originID uuid.UUID,
+	imageID uuid.UUID,
 	resultID uuid.UUID,
 	kind ImageProcessKind,
 	finishedAt time.Time,
@@ -68,12 +68,11 @@ func NewImageProcess(
 	errorReason string,
 ) *ImageProcess {
 	return &ImageProcess{
-		ID:          id,
-		OriginID:    originID,
-		ResultID:    resultID,
-		Kind:        kind,
-		FinishedAt:  finishedAt,
-		ErroredAt:   erroredAt,
-		ErrorReason: errorReason,
+		ID:         id,
+		ImageID:    imageID,
+		ResultID:   resultID,
+		Kind:       kind,
+		FinishedAt: finishedAt,
+		ErroredAt:  erroredAt, ErrorReason: errorReason,
 	}
 }

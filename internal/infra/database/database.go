@@ -3,44 +3,41 @@
 package database
 
 import (
+	"context"
+	"database/sql"
 	"fmt"
 	"log"
-	"sync"
 
+	"entgo.io/ent/dialect"
+	entsql "entgo.io/ent/dialect/sql"
+	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/leorcvargas/bgeraser/ent"
 	"github.com/leorcvargas/bgeraser/internal/infra/config"
-	"github.com/leorcvargas/bgeraser/internal/infra/database/imagesdb"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
 
-var (
-	db   *gorm.DB
-	once sync.Once
-)
+func NewEntClient(cfg *config.Config) *ent.Client {
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+		cfg.Database.Host,
+		cfg.Database.User,
+		cfg.Database.Password,
+		cfg.Database.Name,
+		cfg.Database.Port,
+	)
 
-func NewPostgresDatabase(config *config.Config) *gorm.DB {
-	once.Do(func() {
-		dsn := fmt.Sprintf(
-			"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
-			config.Database.Host,
-			config.Database.User,
-			config.Database.Password,
-			config.Database.Name,
-			config.Database.Port,
-		)
+	db, err := sql.Open("pgx", dsn)
+	if err != nil {
+		log.Fatalf("failed opening connection to postgres: %v", err)
+	}
 
-		gormDB, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-		if err != nil {
-			log.Fatalln("Unable to connect to database:", err)
-		}
+	driver := entsql.OpenDB(dialect.Postgres, db)
+	client := ent.NewClient(ent.Driver(driver))
 
-		// TODO: use versioned migrations
-		if err = gormDB.AutoMigrate(&imagesdb.Model{}); err != nil {
-			log.Fatalln("Unable to migrate database:", err)
-		}
+	ctx := context.Background()
+	// Run the auto migration tool.
+	if err := client.Schema.Create(ctx); err != nil {
+		log.Fatalf("failed creating schema resources: %v", err)
+	}
 
-		db = gormDB
-	})
-
-	return db
+	return client
 }

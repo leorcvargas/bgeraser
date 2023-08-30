@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2/log"
+	"github.com/leorcvargas/bgeraser/ent"
 	"github.com/leorcvargas/bgeraser/internal/infra/config"
 
 	"github.com/gofiber/fiber/v2"
@@ -58,6 +59,7 @@ func NewServer(
 	lifecycle fx.Lifecycle,
 	router *fiber.App,
 	config *config.Config,
+	db *ent.Client,
 ) *fasthttp.Server {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -76,6 +78,12 @@ func NewServer(
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
+			defer func() {
+				if err := db.Close(); err != nil {
+					log.Warn("Error closing the database connection: %s", err)
+				}
+			}()
+
 			log.Info("Stopping the server...")
 
 			return router.ShutdownWithContext(ctx)

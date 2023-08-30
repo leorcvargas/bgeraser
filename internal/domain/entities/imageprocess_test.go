@@ -35,8 +35,8 @@ func TestNewImageProcess(t *testing.T) {
 		t.Errorf("expected ID to be %v, got %v", id, got.ID)
 	}
 
-	if got.OriginID != originID {
-		t.Errorf("expected OriginID to be %v, got %v", originID, got.OriginID)
+	if got.ImageID != originID {
+		t.Errorf("expected ImageID to be %v, got %v", originID, got.ImageID)
 	}
 
 	if got.ResultID != resultID {
@@ -75,8 +75,8 @@ func TestCreateImageProcess(t *testing.T) {
 		t.Errorf("expected ID to be a valid UUID, got %v", got.ID)
 	}
 
-	if got.OriginID != originID {
-		t.Errorf("expected OriginID to be %v, got %v", originID, got.OriginID)
+	if got.ImageID != originID {
+		t.Errorf("expected ImageID to be %v, got %v", originID, got.ImageID)
 	}
 
 	if got.ResultID != uuid.Nil {

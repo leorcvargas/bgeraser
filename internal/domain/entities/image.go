@@ -12,9 +12,9 @@ type Image struct {
 	Format           string    `json:"format"`
 	Size             int64     `json:"size"`
 	OriginalFilename string    `json:"originalFilename"`
-	CreatedAt        time.Time `json:"createdAt"`
-	UpdatedAt        time.Time `json:"updatedAt"`
-	DeletedAt        time.Time `json:"deletedAt"`
+	CreatedAt        time.Time `json:"-"`
+	UpdatedAt        time.Time `json:"-"`
+	DeletedAt        time.Time `json:"-"`
 }
 
 func (i *Image) Extension() string {
@@ -46,16 +46,18 @@ func NewImage(
 	id uuid.UUID,
 	format string,
 	size int64,
+	originalFilename string,
 	createdAt time.Time,
 	updatedAt time.Time,
 	deletedAt time.Time,
 ) *Image {
 	return &Image{
-		ID:        id,
-		Format:    format,
-		Size:      size,
-		CreatedAt: createdAt,
-		UpdatedAt: updatedAt,
-		DeletedAt: deletedAt,
+		ID:               id,
+		Format:           format,
+		Size:             size,
+		OriginalFilename: originalFilename,
+		CreatedAt:        createdAt,
+		UpdatedAt:        updatedAt,
+		DeletedAt:        deletedAt,
 	}
 }

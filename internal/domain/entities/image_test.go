@@ -74,6 +74,7 @@ func TestNewImage(t *testing.T) {
 	id := uuid.New()
 	format := "application/jpeg"
 	size := int64(3412894)
+	originalFilename := "testfile.jpeg"
 	createdAt := time.Now()
 	updatedAt := time.Now()
 	deletedAt := time.Time{}
@@ -82,6 +83,7 @@ func TestNewImage(t *testing.T) {
 		id,
 		format,
 		size,
+		originalFilename,
 		createdAt,
 		updatedAt,
 		deletedAt,
@@ -102,6 +104,14 @@ func TestNewImage(t *testing.T) {
 
 	if got.Size != size {
 		t.Errorf("expected Size to match %d, got %d", size, got.Size)
+	}
+
+	if got.OriginalFilename != originalFilename {
+		t.Errorf(
+			"expected OriginalFilename to match %s, got %s",
+			originalFilename,
+			got.OriginalFilename,
+		)
 	}
 
 	if got.CreatedAt != createdAt {

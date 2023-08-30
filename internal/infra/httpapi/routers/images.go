@@ -11,6 +11,7 @@ type ImagesRouter struct {
 
 func (i *ImagesRouter) Load(r *fiber.App) {
 	r.Post("/images", i.controller.Upload)
+	r.Post("/images/:id/process/:kind", i.controller.Process)
 }
 
 func NewImagesRouter(controller *controllers.ImagesController) *ImagesRouter {
