@@ -1,13 +1,16 @@
 package images
 
-import "github.com/leorcvargas/bgeraser/internal/domain/entities"
+import (
+	"github.com/google/uuid"
+	"github.com/leorcvargas/bgeraser/internal/domain/entities"
+)
 
 type CreateProcess struct {
 	repository Repository
 }
 
 func (c *CreateProcess) Exec(
-	id string,
+	id uuid.UUID,
 	kind entities.ImageProcessKind,
 ) (*entities.ImageProcess, error) {
 	image, err := c.repository.Find(id)

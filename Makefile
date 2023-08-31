@@ -10,6 +10,9 @@ deps:
 clean:
 	rm -rf ./bin
 
+test:
+	go test -coverprofile=coverage.out -v ./...
+
 docker:
 	docker build -t leorcvargas/bgeraser .
 

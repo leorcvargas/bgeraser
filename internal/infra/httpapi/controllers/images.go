@@ -8,6 +8,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
+	"github.com/google/uuid"
 	"github.com/leorcvargas/bgeraser/internal/domain/entities"
 	domainerrors "github.com/leorcvargas/bgeraser/internal/domain/errors"
 	"github.com/leorcvargas/bgeraser/internal/domain/images"
@@ -24,9 +25,10 @@ type ImagesController struct {
 	save          *images.Save
 	config        *config.Config
 	createProcess *images.CreateProcess
+	findProcess   *images.FindProcess
 }
 
-func (i *ImagesController) Upload(c *fiber.Ctx) error {
+func (i *ImagesController) Create(c *fiber.Ctx) error {
 	form, err := c.MultipartForm()
 	if err != nil {
 		return c.SendStatus(http.StatusBadRequest)
@@ -70,7 +72,7 @@ func (i *ImagesController) Upload(c *fiber.Ctx) error {
 	return c.Status(http.StatusOK).JSON(Response{Data: result})
 }
 
-func (i *ImagesController) Process(c *fiber.Ctx) error {
+func (i *ImagesController) CreateProcess(c *fiber.Ctx) error {
 	id := c.Params("id")
 	kind := c.Params("kind")
 
@@ -80,7 +82,14 @@ func (i *ImagesController) Process(c *fiber.Ctx) error {
 		})
 	}
 
-	process, err := i.createProcess.Exec(id, entities.ImageProcessKindRemoveBackground)
+	parsedID, err := uuid.Parse(id)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(ErrResponse{
+			Message: "Invalid id",
+		})
+	}
+
+	process, err := i.createProcess.Exec(parsedID, entities.ImageProcessKindRemoveBackground)
 	if err != nil {
 		if errors.Is(err, domainerrors.ErrImageNotFound) {
 			return c.Status(http.StatusNotFound).JSON(ErrResponse{
@@ -89,6 +98,40 @@ func (i *ImagesController) Process(c *fiber.Ctx) error {
 		}
 
 		log.Errorf("Error creating process: %s", err.Error())
+
+		return c.Status(http.StatusInternalServerError).JSON(InternalServerErrResponse)
+	}
+
+	return c.Status(http.StatusOK).JSON(Response{Data: process})
+}
+
+func (i *ImagesController) GetProcess(c *fiber.Ctx) error {
+	id := c.Params("id")
+	processID := c.Params("process_id")
+
+	parsedID, err := uuid.Parse(id)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(ErrResponse{
+			Message: "Invalid id",
+		})
+	}
+
+	parsedProcessID, err := uuid.Parse(processID)
+	if err != nil {
+		return c.Status(http.StatusBadRequest).JSON(ErrResponse{
+			Message: "Invalid process id",
+		})
+	}
+
+	process, err := i.findProcess.Get(parsedID, parsedProcessID)
+	if err != nil {
+		if errors.Is(err, domainerrors.ErrImageProcessNotFound) {
+			return c.Status(http.StatusNotFound).JSON(ErrResponse{
+				Message: err.Error(),
+			})
+		}
+
+		log.Errorf("Error getting process: %s", err.Error())
 
 		return c.Status(http.StatusInternalServerError).JSON(InternalServerErrResponse)
 	}
@@ -118,11 +161,13 @@ func NewImagesController(
 	create *images.Create,
 	save *images.Save,
 	createProcess *images.CreateProcess,
+	findProcess *images.FindProcess,
 ) *ImagesController {
 	return &ImagesController{
 		config:        config,
 		create:        create,
 		save:          save,
 		createProcess: createProcess,
+		findProcess:   findProcess,
 	}
 }

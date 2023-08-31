@@ -24,11 +24,11 @@ func TestNewImageProcess(t *testing.T) {
 	got := entities.NewImageProcess(
 		id,
 		originID,
-		resultID,
+		&resultID,
 		kind,
-		finishedAt,
-		erroredAt,
-		errorReason,
+		&finishedAt,
+		&erroredAt,
+		&errorReason,
 	)
 
 	if got.ID != id {
@@ -39,7 +39,7 @@ func TestNewImageProcess(t *testing.T) {
 		t.Errorf("expected ImageID to be %v, got %v", originID, got.ImageID)
 	}
 
-	if got.ResultID != resultID {
+	if got.ResultID != &resultID {
 		t.Errorf("expected ResultID to be %v, got %v", resultID, got.ResultID)
 	}
 
@@ -47,15 +47,15 @@ func TestNewImageProcess(t *testing.T) {
 		t.Errorf("expected Kind to be %v, got %v", kind, got.Kind)
 	}
 
-	if got.FinishedAt != finishedAt {
+	if got.FinishedAt != &finishedAt {
 		t.Errorf("expected FinishedAt to be %v, got %v", finishedAt, got.FinishedAt)
 	}
 
-	if got.ErroredAt != erroredAt {
+	if got.ErroredAt != &erroredAt {
 		t.Errorf("expected ErroredAt to be %v, got %v", erroredAt, got.ErroredAt)
 	}
 
-	if got.ErrorReason != errorReason {
+	if got.ErrorReason != &errorReason {
 		t.Errorf("expected ErrorReason to be %v, got %v", errorReason, got.ErrorReason)
 	}
 }
@@ -79,7 +79,7 @@ func TestCreateImageProcess(t *testing.T) {
 		t.Errorf("expected ImageID to be %v, got %v", originID, got.ImageID)
 	}
 
-	if got.ResultID != uuid.Nil {
+	if got.ResultID != nil {
 		t.Errorf("expected ResultID to be an empty UUID, got %v", got.ResultID)
 	}
 
@@ -87,15 +87,15 @@ func TestCreateImageProcess(t *testing.T) {
 		t.Errorf("expected Kind to be %v, got %v", kind, got.Kind)
 	}
 
-	if !got.FinishedAt.IsZero() {
+	if got.FinishedAt != nil {
 		t.Errorf("expected FinishedAt to be zero, got %v", got.FinishedAt)
 	}
 
-	if !got.ErroredAt.IsZero() {
+	if got.ErroredAt != nil {
 		t.Errorf("expected ErroredAt to be zero, got %v", got.ErroredAt)
 	}
 
-	if got.ErrorReason != "" {
+	if got.ErrorReason != nil {
 		t.Errorf("expected ErrorReason to be empty, got %v", got.ErrorReason)
 	}
 }
@@ -114,11 +114,11 @@ func TestImageProcess_SetFinish(t *testing.T) {
 	got := entities.NewImageProcess(
 		id,
 		originID,
-		resultID,
+		&resultID,
 		kind,
-		finishedAt,
-		erroredAt,
-		errorReason,
+		&finishedAt,
+		&erroredAt,
+		&errorReason,
 	)
 
 	err := got.SetFinish(resultID)
@@ -130,11 +130,11 @@ func TestImageProcess_SetFinish(t *testing.T) {
 		t.Errorf("expected FinishedAt to be not zero, got %v", got.FinishedAt)
 	}
 
-	if got.ErroredAt != erroredAt {
+	if got.ErroredAt != &erroredAt {
 		t.Errorf("expected ErroredAt to be %v, got %v", erroredAt, got.ErroredAt)
 	}
 
-	if got.ErrorReason != errorReason {
+	if got.ErrorReason != &errorReason {
 		t.Errorf("expected ErrorReason to be %v, got %v", errorReason, got.ErrorReason)
 	}
 }
@@ -161,26 +161,29 @@ func TestImageProcess_SetError(t *testing.T) {
 	sut := entities.ImageProcess{}
 	sut.SetError(err)
 
-	if sut.ErroredAt.IsZero() {
+	errorReason := err.Error()
+
+	if sut.ErroredAt == nil || sut.ErroredAt.IsZero() {
 		t.Errorf("expected ErroredAt to be not zero, got %v", sut.ErroredAt)
 	}
 
-	if sut.ErrorReason != err.Error() {
-		t.Errorf("expected ErrorReason to be %v, got %v", err.Error(), sut.ErrorReason)
+	if *sut.ErrorReason != errorReason {
+		t.Errorf("expected ErrorReason to be %v, got %v", errorReason, *sut.ErrorReason)
 	}
 }
 
 func TestImageProcess_Failed(t *testing.T) {
 	t.Parallel()
 
-	sut := entities.ImageProcess{ErroredAt: time.Time{}}
+	sut := entities.ImageProcess{ErroredAt: &time.Time{}}
 
 	got := sut.Failed()
 	if got {
 		t.Errorf("expected Failed to return false, got %v", got)
 	}
 
-	sut.ErroredAt = time.Now()
+	now := time.Now()
+	sut.ErroredAt = &now
 
 	got = sut.Failed()
 	if !got {
@@ -191,14 +194,15 @@ func TestImageProcess_Failed(t *testing.T) {
 func TestImageProcess_Finished(t *testing.T) {
 	t.Parallel()
 
-	sut := entities.ImageProcess{FinishedAt: time.Time{}}
+	sut := entities.ImageProcess{FinishedAt: &time.Time{}}
 
 	got := sut.Finished()
 	if got {
 		t.Errorf("expected Finished to return false, got %v", got)
 	}
 
-	sut.FinishedAt = time.Now()
+	now := time.Now()
+	sut.FinishedAt = &now
 
 	got = sut.Finished()
 	if !got {

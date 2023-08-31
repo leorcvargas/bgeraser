@@ -10,8 +10,9 @@ type ImagesRouter struct {
 }
 
 func (i *ImagesRouter) Load(r *fiber.App) {
-	r.Post("/images", i.controller.Upload)
-	r.Post("/images/:id/process/:kind", i.controller.Process)
+	r.Post("/images", i.controller.Create)
+	r.Post("/images/:id/process/:kind", i.controller.CreateProcess)
+	r.Get("/images/:id/process/:process_id", i.controller.GetProcess)
 }
 
 func NewImagesRouter(controller *controllers.ImagesController) *ImagesRouter {

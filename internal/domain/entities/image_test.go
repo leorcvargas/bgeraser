@@ -61,7 +61,7 @@ func TestCreateImage(t *testing.T) {
 				t.Error("image.CreatedAt should not be zero")
 			}
 
-			if !image.DeletedAt.IsZero() {
+			if image.DeletedAt != nil {
 				t.Error("image.DeletedAt should be zero")
 			}
 		})
@@ -77,7 +77,6 @@ func TestNewImage(t *testing.T) {
 	originalFilename := "testfile.jpeg"
 	createdAt := time.Now()
 	updatedAt := time.Now()
-	deletedAt := time.Time{}
 
 	got := entities.NewImage(
 		id,
@@ -86,7 +85,7 @@ func TestNewImage(t *testing.T) {
 		originalFilename,
 		createdAt,
 		updatedAt,
-		deletedAt,
+		nil,
 	)
 
 	if got == nil {
@@ -122,7 +121,7 @@ func TestNewImage(t *testing.T) {
 		t.Errorf("expected UpdatedAt to match %v, got %v", updatedAt, got.UpdatedAt)
 	}
 
-	if !got.DeletedAt.IsZero() {
+	if got.DeletedAt != nil {
 		t.Errorf("expected DeletedAt to be zero")
 	}
 }

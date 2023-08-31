@@ -16,3 +16,6 @@ venv/
 
 # OS 
 .DS_Store
+
+# Test cov
+coverage.out

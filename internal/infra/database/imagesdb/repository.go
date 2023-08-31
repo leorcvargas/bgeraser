@@ -2,10 +2,10 @@ package imagesdb
 
 import (
 	"context"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/leorcvargas/bgeraser/ent"
+	"github.com/leorcvargas/bgeraser/ent/imageprocess"
 	"github.com/leorcvargas/bgeraser/internal/domain/entities"
 	domainerrors "github.com/leorcvargas/bgeraser/internal/domain/errors"
 )
@@ -28,24 +28,14 @@ func (p *PostgresImageRepository) Save(image *entities.Image) error {
 	return err
 }
 
-func (p *PostgresImageRepository) Find(id string) (*entities.Image, error) {
-	parsedID, err := uuid.Parse(id)
-	if err != nil {
-		return nil, err
-	}
-
-	result, err := p.db.Image.Get(p.ctx, parsedID)
+func (p *PostgresImageRepository) Find(id uuid.UUID) (*entities.Image, error) {
+	result, err := p.db.Image.Get(p.ctx, id)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, domainerrors.ErrImageNotFound
 		}
 
 		return nil, err
-	}
-
-	deletedAt := time.Time{}
-	if result.DeletedAt != nil {
-		deletedAt = *result.DeletedAt
 	}
 
 	entity := entities.NewImage(
@@ -55,7 +45,7 @@ func (p *PostgresImageRepository) Find(id string) (*entities.Image, error) {
 		result.OriginalFilename,
 		result.CreatedAt,
 		result.UpdatedAt,
-		deletedAt,
+		result.DeletedAt,
 	)
 
 	return entity, nil
@@ -69,6 +59,44 @@ func (p *PostgresImageRepository) SaveProcess(process *entities.ImageProcess) er
 		Save(p.ctx)
 
 	return err
+}
+
+func (p *PostgresImageRepository) FindProcess(
+	imageID, processID uuid.UUID,
+) (*entities.ImageProcess, error) {
+	result, err := p.db.ImageProcess.
+		Query().
+		Where(
+			imageprocess.And(
+				imageprocess.ID(processID),
+				imageprocess.ImageIDEQ(imageID),
+			),
+		).
+		Only(p.ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, domainerrors.ErrImageProcessNotFound
+		}
+
+		return nil, err
+	}
+
+	var resultID *uuid.UUID
+	if result.ResultID != uuid.Nil {
+		resultID = &result.ResultID
+	}
+
+	entity := entities.NewImageProcess(
+		result.ID,
+		result.ImageID,
+		resultID,
+		entities.ImageProcessKind(result.Kind),
+		result.FinishedAt,
+		result.ErroredAt,
+		result.ErrorReason,
+	)
+
+	return entity, nil
 }
 
 func NewPostgresImageRepository(db *ent.Client) *PostgresImageRepository {
