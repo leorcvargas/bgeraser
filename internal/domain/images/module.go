@@ -7,4 +7,5 @@ var Module = fx.Module("images",
 	fx.Provide(NewSave),
 	fx.Provide(NewCreateProcess),
 	fx.Provide(NewFindProcess),
+	fx.Provide(NewJobQueue),
 )

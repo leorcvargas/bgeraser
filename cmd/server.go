@@ -10,6 +10,7 @@ import (
 	"github.com/leorcvargas/bgeraser/internal/infra/httpapi/controllers"
 	"github.com/leorcvargas/bgeraser/internal/infra/httpapi/routers"
 	"github.com/leorcvargas/bgeraser/internal/infra/storage"
+	"github.com/leorcvargas/bgeraser/internal/infra/worker"
 	"go.uber.org/fx"
 
 	_ "go.uber.org/automaxprocs"
@@ -29,6 +30,7 @@ func main() {
 		images.Module,
 		httpapi.Module,
 		storage.Module,
+		worker.Module,
 	)
 
 	app.Run()
