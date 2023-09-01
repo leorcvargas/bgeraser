@@ -19,13 +19,13 @@ func (c *CreateProcess) Exec(
 		return nil, err
 	}
 
-	process := entities.CreateImageProcess(image.ID, entities.ImageProcessKindRemoveBackground)
+	process := entities.CreateImageProcess(image, entities.ImageProcessKindRemoveBackground)
 
 	if err := c.repository.SaveProcess(process); err != nil {
 		return nil, err
 	}
 
-	c.jobQueue <- Job{Payload: process}
+	c.jobQueue <- Job{Payload: *process}
 
 	return process, nil
 }

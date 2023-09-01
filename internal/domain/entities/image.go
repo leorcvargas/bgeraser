@@ -8,13 +8,13 @@ import (
 )
 
 type Image struct {
-	ID               uuid.UUID  `json:"id"`
-	Format           string     `json:"format"`
-	Size             int64      `json:"size"`
-	OriginalFilename string     `json:"originalFilename"`
 	CreatedAt        time.Time  `json:"-"`
 	UpdatedAt        time.Time  `json:"-"`
 	DeletedAt        *time.Time `json:"-"`
+	Format           string     `json:"format"`
+	OriginalFilename string     `json:"originalFilename"`
+	Size             int64      `json:"size"`
+	ID               uuid.UUID  `json:"id"`
 }
 
 func (i *Image) Extension() string {
@@ -23,6 +23,12 @@ func (i *Image) Extension() string {
 
 func (i *Image) Filename() string {
 	return fmt.Sprintf("%s.%s", i.ID.String(), i.Extension())
+}
+
+func (i *Image) SetStatInfo(name string, size int64) {
+	i.Size = size
+	i.OriginalFilename = name
+	i.UpdatedAt = time.Now()
 }
 
 func CreateImage(
@@ -39,6 +45,17 @@ func CreateImage(
 		OriginalFilename: originalFilename,
 		CreatedAt:        now,
 		UpdatedAt:        now,
+	}
+}
+
+func CreateResultImage(format string) *Image {
+	now := time.Now()
+
+	return &Image{
+		ID:        uuid.New(),
+		Format:    format,
+		CreatedAt: now,
+		UpdatedAt: now,
 	}
 }
 

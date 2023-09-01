@@ -22,6 +22,7 @@ def erase(input_path, output_path):
 
 
 def main():
+    print("[rembg] Starting script")
     try:
         args = parser.parse_args()
 

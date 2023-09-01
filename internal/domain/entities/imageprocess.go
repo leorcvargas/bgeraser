@@ -14,13 +14,15 @@ const (
 )
 
 type ImageProcess struct {
-	ID          uuid.UUID        `json:"id"`
-	ImageID     uuid.UUID        `json:"imageId"`
-	ResultID    *uuid.UUID       `json:"resultId"`
-	Kind        ImageProcessKind `json:"kind"`
 	FinishedAt  *time.Time       `json:"finishedAt"`
+	ResultID    *uuid.UUID       `json:"resultId"`
 	ErroredAt   *time.Time       `json:"erroredAt"`
 	ErrorReason *string          `json:"errorReason"`
+	Image       *Image           `json:"image"`
+	Result      *Image           `json:"result"`
+	Kind        ImageProcessKind `json:"kind"`
+	ID          uuid.UUID        `json:"id"`
+	ImageID     uuid.UUID        `json:"imageId"`
 }
 
 func (i *ImageProcess) SetError(err error) {
@@ -53,12 +55,13 @@ func (i *ImageProcess) Finished() bool {
 }
 
 func CreateImageProcess(
-	imageID uuid.UUID,
+	image *Image,
 	kind ImageProcessKind,
 ) *ImageProcess {
 	return &ImageProcess{
 		ID:      uuid.New(),
-		ImageID: imageID,
+		ImageID: image.ID,
+		Image:   image,
 		Kind:    kind,
 	}
 }
@@ -71,6 +74,8 @@ func NewImageProcess(
 	finishedAt *time.Time,
 	erroredAt *time.Time,
 	errorReason *string,
+	image *Image,
+	result *Image,
 ) *ImageProcess {
 	return &ImageProcess{
 		ID:          id,
@@ -80,5 +85,7 @@ func NewImageProcess(
 		FinishedAt:  finishedAt,
 		ErroredAt:   erroredAt,
 		ErrorReason: errorReason,
+		Image:       image,
+		Result:      result,
 	}
 }

@@ -3,7 +3,7 @@ package images
 import "github.com/leorcvargas/bgeraser/internal/domain/entities"
 
 type Job struct {
-	Payload *entities.ImageProcess
+	Payload entities.ImageProcess
 }
 
 type JobQueue chan Job
