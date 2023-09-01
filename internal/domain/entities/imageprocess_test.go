@@ -29,6 +29,8 @@ func TestNewImageProcess(t *testing.T) {
 		&finishedAt,
 		&erroredAt,
 		&errorReason,
+		nil,
+		nil,
 	)
 
 	if got.ID != id {
@@ -63,11 +65,11 @@ func TestNewImageProcess(t *testing.T) {
 func TestCreateImageProcess(t *testing.T) {
 	t.Parallel()
 
-	originID := uuid.New()
+	origin := &entities.Image{ID: uuid.New()}
 	kind := entities.ImageProcessKindRemoveBackground
 
 	got := entities.CreateImageProcess(
-		originID,
+		origin,
 		kind,
 	)
 
@@ -75,8 +77,8 @@ func TestCreateImageProcess(t *testing.T) {
 		t.Errorf("expected ID to be a valid UUID, got %v", got.ID)
 	}
 
-	if got.ImageID != originID {
-		t.Errorf("expected ImageID to be %v, got %v", originID, got.ImageID)
+	if got.ImageID != origin.ID {
+		t.Errorf("expected ImageID to be %v, got %v", origin.ID, got.ImageID)
 	}
 
 	if got.ResultID != nil {
@@ -119,6 +121,8 @@ func TestImageProcess_SetFinish(t *testing.T) {
 		&finishedAt,
 		&erroredAt,
 		&errorReason,
+		nil,
+		nil,
 	)
 
 	err := got.SetFinish(resultID)
