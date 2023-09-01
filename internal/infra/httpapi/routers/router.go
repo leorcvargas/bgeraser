@@ -1,9 +1,20 @@
 package routers
 
 import (
+	"net/http"
+
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
+	"github.com/gofiber/fiber/v2/middleware/csrf"
+	"github.com/gofiber/fiber/v2/middleware/etag"
+	"github.com/gofiber/fiber/v2/middleware/filesystem"
+	"github.com/gofiber/fiber/v2/middleware/helmet"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
+	"github.com/gofiber/fiber/v2/middleware/recover"
+
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/requestid"
 	"github.com/leorcvargas/bgeraser/internal/infra/config"
 )
 
@@ -27,12 +38,34 @@ func buildRouterConfig(config *config.Config) fiber.Config {
 	return routerConfig
 }
 
+func loadMiddlewares(r *fiber.App) {
+	// Security
+	r.Use(recover.New())
+	r.Use(csrf.New())
+	r.Use(etag.New())
+	r.Use(helmet.New())
+	r.Use(limiter.New(limiter.Config{Max: 25}))
+
+	// Access log
+	r.Use(requestid.New())
+	r.Use(logger.New(logger.Config{
+		Format: "${pid} | ${ip} | ${locals:requestid} | ${status} | ${method} ${path}\n",
+	}))
+
+	// Static serve
+	r.Use("/i", filesystem.New(filesystem.Config{
+		Root: http.Dir("./data/images"),
+	}))
+}
+
 func MakeRouter(
 	routers []Router,
 	config *config.Config,
 ) *fiber.App {
 	routerConfig := buildRouterConfig(config)
+
 	r := fiber.New(routerConfig)
+	loadMiddlewares(r)
 
 	for _, router := range routers {
 		router.Load(r)
