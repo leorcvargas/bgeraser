@@ -19,3 +19,7 @@ venv/
 
 # Test cov
 coverage.out
+
+# Local data folder
+data/images/*
+!data/images/.gitkeep

@@ -18,32 +18,6 @@ services:
       interval: 15s
       timeout: 25s
 
-  api:
-    build: .
-    restart: always
-    hostname: api
-    environment:
-      - ENABLE_SONIC_JSON=1
-      - DB_HOST=db
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - DB_NAME=bgeraser
-      - DB_PORT=5432
-      - CPU_PROFILE=/app/prof/cpu-1.prof
-      - MEM_PROFILE=/app/prof/mem-1.prof
-      - CACHE_HOST=cache
-      - CACHE_PORT=6379
-      - SERVER_PORT=8080
-      - ENABLE_PROFILING=0
-      - ENABLE_PREFORK=0
-    volumes:
-      - ./prof:/app/prof
-    depends_on:
-      db:
-        condition: service_healthy
-    expose:
-      - "8080"
-
 volumes:
   postgres-db:
 

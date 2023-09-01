@@ -5,7 +5,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/leorcvargas/bgeraser/ent"
-	"github.com/leorcvargas/bgeraser/ent/imageprocess"
 	"github.com/leorcvargas/bgeraser/internal/domain/entities"
 	domainerrors "github.com/leorcvargas/bgeraser/internal/domain/errors"
 )
@@ -61,18 +60,9 @@ func (p *PostgresImageRepository) SaveProcess(process *entities.ImageProcess) er
 	return err
 }
 
-func (p *PostgresImageRepository) FindProcess(
-	imageID, processID uuid.UUID,
+func (p *PostgresImageRepository) FindProcess(processID uuid.UUID,
 ) (*entities.ImageProcess, error) {
-	result, err := p.db.ImageProcess.
-		Query().
-		Where(
-			imageprocess.And(
-				imageprocess.ID(processID),
-				imageprocess.ImageIDEQ(imageID),
-			),
-		).
-		Only(p.ctx)
+	result, err := p.db.ImageProcess.Get(p.ctx, processID)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, domainerrors.ErrImageProcessNotFound

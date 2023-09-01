@@ -9,5 +9,5 @@ type Repository interface {
 	Save(image *entities.Image) error
 	Find(id uuid.UUID) (*entities.Image, error)
 	SaveProcess(process *entities.ImageProcess) error
-	FindProcess(imageID, processID uuid.UUID) (*entities.ImageProcess, error)
+	FindProcess(processID uuid.UUID) (*entities.ImageProcess, error)
 }

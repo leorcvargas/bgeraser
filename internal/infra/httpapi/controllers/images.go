@@ -59,10 +59,12 @@ func (i *ImagesController) Create(c *fiber.Ctx) error {
 
 		localPath := fmt.Sprintf("%s/%s", i.config.Storage.LocalPath, image.Filename())
 		if err := c.SaveFile(file, localPath); err != nil {
+			log.Errorw("error saving file to disk: %w", err)
 			return c.Status(http.StatusInternalServerError).JSON(InternalServerErrResponse)
 		}
 
 		if err := i.save.Exec(image); err != nil {
+			log.Errorw("error saving file info: %w", err)
 			return c.Status(http.StatusInternalServerError).JSON(InternalServerErrResponse)
 		}
 
@@ -107,7 +109,6 @@ func (i *ImagesController) CreateProcess(c *fiber.Ctx) error {
 
 func (i *ImagesController) GetProcess(c *fiber.Ctx) error {
 	id := c.Params("id")
-	processID := c.Params("process_id")
 
 	parsedID, err := uuid.Parse(id)
 	if err != nil {
@@ -116,14 +117,7 @@ func (i *ImagesController) GetProcess(c *fiber.Ctx) error {
 		})
 	}
 
-	parsedProcessID, err := uuid.Parse(processID)
-	if err != nil {
-		return c.Status(http.StatusBadRequest).JSON(ErrResponse{
-			Message: "Invalid process id",
-		})
-	}
-
-	process, err := i.findProcess.Get(parsedID, parsedProcessID)
+	process, err := i.findProcess.Get(parsedID)
 	if err != nil {
 		if errors.Is(err, domainerrors.ErrImageProcessNotFound) {
 			return c.Status(http.StatusNotFound).JSON(ErrResponse{

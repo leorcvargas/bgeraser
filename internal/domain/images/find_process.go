@@ -9,8 +9,8 @@ type FindProcess struct {
 	repository Repository
 }
 
-func (f *FindProcess) Get(imageID, processID uuid.UUID) (*entities.ImageProcess, error) {
-	return f.repository.FindProcess(imageID, processID)
+func (f *FindProcess) Get(processID uuid.UUID) (*entities.ImageProcess, error) {
+	return f.repository.FindProcess(processID)
 }
 
 func NewFindProcess(repository Repository) *FindProcess {
