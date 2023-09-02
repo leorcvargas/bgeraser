@@ -33,17 +33,23 @@ func (i *ImageProcess) SetError(err error) {
 	i.ErrorReason = &errorReason
 }
 
-func (i *ImageProcess) SetFinish(resultID uuid.UUID) error {
-	if resultID == uuid.Nil {
-		return domainerrors.ErrImageProcessEmptyResultID
+func (i *ImageProcess) FinishProcess(resultFilename string, resultSize int64) error {
+	if i.Result == nil {
+		return domainerrors.ErrImageProcessEmptyResult
 	}
 
 	now := time.Now()
 
 	i.FinishedAt = &now
-	i.ResultID = &resultID
+	i.Result.SetStatInfo(resultFilename, resultSize)
 
 	return nil
+}
+
+func (i *ImageProcess) StartProcess() {
+	result := CreateResultImage("image/png")
+	i.Result = result
+	i.ResultID = &result.ID
 }
 
 func (i *ImageProcess) Failed() bool {

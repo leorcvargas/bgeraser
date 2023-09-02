@@ -76,24 +76,23 @@ func (p *PostgresImageRepository) UpdateProcessOnError(process *entities.ImagePr
 	return err
 }
 
-func (p *PostgresImageRepository) UpdateProcessOnSuccess(process *entities.ImageProcess, result *entities.Image) error {
+func (p *PostgresImageRepository) UpdateProcessOnSuccess(process *entities.ImageProcess) error {
 	_, err := p.db.Image.Create().
-		SetID(result.ID).
-		SetSize(result.Size).
-		SetFormat(result.Format).
-		SetOriginalFilename(result.OriginalFilename).
-		SetCreatedAt(result.CreatedAt).
-		SetUpdatedAt(result.UpdatedAt).
+		SetID(process.Result.ID).
+		SetSize(process.Result.Size).
+		SetFormat(process.Result.Format).
+		SetOriginalFilename(process.Result.OriginalFilename).
+		SetCreatedAt(process.Result.CreatedAt).
+		SetUpdatedAt(process.Result.UpdatedAt).
 		Save(p.ctx)
 	if err != nil {
-		log.Debug(result)
 		log.Error(err)
 		return err
 	}
 
 	_, err = p.db.ImageProcess.
 		UpdateOneID(process.ID).
-		SetResultID(result.ID).
+		SetResultID(process.Result.ID).
 		SetFinishedAt(*process.FinishedAt).
 		Save(p.ctx)
 
@@ -111,7 +110,6 @@ func (p *PostgresImageRepository) UpdateProcessOnSuccess(process *entities.Image
 
 func (p *PostgresImageRepository) FindProcess(processID uuid.UUID,
 ) (*entities.ImageProcess, error) {
-	// result, err := p.db.ImageProcess.Get(p.ctx, processID)
 	result, err := p.db.ImageProcess.Query().WithOrigin().WithResult().Where(imageprocess.ID(processID)).First(p.ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {

@@ -13,26 +13,25 @@ import (
 
 type RemoveBackgroundProcess struct {
 	config       *config.Config
-	ImageProcess *entities.ImageProcess
-	ResultImage  *entities.Image
+	imageProcess entities.ImageProcess
 }
 
-func (r *RemoveBackgroundProcess) Exec() error {
-	r.setResultImage()
+func (r *RemoveBackgroundProcess) Exec() (*entities.ImageProcess, error) {
+	r.imageProcess.StartProcess()
 
 	if err := r.runCommand(); err != nil {
-		return r.handleError(err)
+		return nil, r.handleError(err)
 	}
 
 	if err := r.finish(); err != nil {
-		return r.handleError(err)
+		return nil, r.handleError(err)
 	}
 
-	return nil
+	return &r.imageProcess, nil
 }
 
 func (r *RemoveBackgroundProcess) handleError(err error) error {
-	r.ImageProcess.SetError(err)
+	r.imageProcess.SetError(err)
 
 	return err
 }
@@ -43,7 +42,7 @@ func (r *RemoveBackgroundProcess) finish() error {
 		return err
 	}
 
-	file, err := os.Open(workingdir + "/" + r.config.Storage.LocalPath + "/" + r.ResultImage.Filename())
+	file, err := os.Open(workingdir + "/" + r.config.Storage.LocalPath + "/" + r.imageProcess.Result.Filename())
 	if err != nil {
 		return err
 	}
@@ -54,10 +53,7 @@ func (r *RemoveBackgroundProcess) finish() error {
 		return err
 	}
 
-	r.ResultImage.SetStatInfo(stat.Name(), stat.Size())
-	r.ImageProcess.SetFinish(r.ResultImage.ID)
-
-	return nil
+	return r.imageProcess.FinishProcess(stat.Name(), stat.Size())
 }
 
 func (r *RemoveBackgroundProcess) runCommand() error {
@@ -74,12 +70,8 @@ func (r *RemoveBackgroundProcess) runCommand() error {
 	return command.Wait()
 }
 
-func (r *RemoveBackgroundProcess) setResultImage() {
-	r.ResultImage = entities.CreateResultImage("image/png")
-}
-
 func (r *RemoveBackgroundProcess) buildCommand() (*exec.Cmd, error) {
-	if r.ResultImage == nil {
+	if r.imageProcess.Result == nil {
 		return nil, errors.New("RemoveBackgroundProcess.resultImage is empty")
 	}
 
@@ -93,8 +85,8 @@ func (r *RemoveBackgroundProcess) buildCommand() (*exec.Cmd, error) {
 		Args: []string{
 			"-c",
 			workingdir + "/scripts/rembg/run.sh",
-			r.ImageProcess.Image.Filename(),
-			r.ResultImage.Filename(),
+			r.imageProcess.Image.Filename(),
+			r.imageProcess.Result.Filename(),
 		},
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
@@ -105,6 +97,6 @@ func (r *RemoveBackgroundProcess) buildCommand() (*exec.Cmd, error) {
 	return cmd, nil
 }
 
-func NewRemoveBackgroundProcess(imageProcess *entities.ImageProcess, config *config.Config) *RemoveBackgroundProcess {
-	return &RemoveBackgroundProcess{ImageProcess: imageProcess, config: config}
+func NewRemoveBackgroundProcess(imageProcess entities.ImageProcess, config *config.Config) *RemoveBackgroundProcess {
+	return &RemoveBackgroundProcess{imageProcess: imageProcess, config: config}
 }

@@ -7,7 +7,7 @@ import (
 
 type CreateProcess struct {
 	repository Repository
-	jobQueue   JobQueue
+	jobQueue   ProcessInJobQueue
 }
 
 func (c *CreateProcess) Exec(
@@ -25,12 +25,12 @@ func (c *CreateProcess) Exec(
 		return nil, err
 	}
 
-	c.jobQueue <- Job{Payload: *process}
+	c.jobQueue <- ProcessInJob{Payload: *process}
 
 	return process, nil
 }
 
-func NewCreateProcess(repository Repository, jobQueue JobQueue) *CreateProcess {
+func NewCreateProcess(repository Repository, jobQueue ProcessInJobQueue) *CreateProcess {
 	return &CreateProcess{
 		repository: repository,
 		jobQueue:   jobQueue,

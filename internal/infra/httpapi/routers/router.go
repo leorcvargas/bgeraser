@@ -6,15 +6,13 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
-	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
-	"github.com/gofiber/fiber/v2/middleware/recover"
-
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
+
 	"github.com/leorcvargas/bgeraser/internal/infra/config"
 )
 
@@ -40,8 +38,9 @@ func buildRouterConfig(config *config.Config) fiber.Config {
 
 func loadMiddlewares(r *fiber.App) {
 	// Security
-	r.Use(recover.New())
-	r.Use(csrf.New())
+	// r.Use(recover.New())
+	// TODO uncomment later
+	// r.Use(csrf.New())
 	r.Use(etag.New())
 	r.Use(helmet.New())
 	r.Use(limiter.New(limiter.Config{Max: 25}))
@@ -52,7 +51,7 @@ func loadMiddlewares(r *fiber.App) {
 		Format: "${pid} | ${ip} | ${locals:requestid} | ${status} | ${method} ${path}\n",
 	}))
 
-	// Static serve
+	// Static server
 	r.Use("/i", filesystem.New(filesystem.Config{
 		Root: http.Dir("./data/images"),
 	}))

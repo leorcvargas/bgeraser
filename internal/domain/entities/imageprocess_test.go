@@ -102,7 +102,7 @@ func TestCreateImageProcess(t *testing.T) {
 	}
 }
 
-func TestImageProcess_SetFinish(t *testing.T) {
+func TestImageProcess_FinishProcess(t *testing.T) {
 	t.Parallel()
 
 	id := uuid.New()
@@ -124,8 +124,9 @@ func TestImageProcess_SetFinish(t *testing.T) {
 		nil,
 		nil,
 	)
+	got.StartProcess()
 
-	err := got.SetFinish(resultID)
+	err := got.FinishProcess("fake-file", 1024)
 	if err != nil {
 		t.Errorf("expected err to be nil, got %v", err)
 	}
@@ -146,12 +147,11 @@ func TestImageProcess_SetFinish(t *testing.T) {
 func TestImageProcess_SetFinish_Error(t *testing.T) {
 	t.Parallel()
 
-	resultID := uuid.Nil
-	expected := domainerrors.ErrImageProcessEmptyResultID
+	expected := domainerrors.ErrImageProcessEmptyResult
 
 	sut := entities.ImageProcess{}
 
-	err := sut.SetFinish(resultID)
+	err := sut.FinishProcess("fake-result", 1024)
 	if !errors.Is(err, expected) {
 		t.Errorf("expected err to be %v, got %v", expected, err)
 	}

@@ -10,10 +10,11 @@ import (
 	"github.com/leorcvargas/bgeraser/internal/infra/httpapi/controllers"
 	"github.com/leorcvargas/bgeraser/internal/infra/httpapi/routers"
 	"github.com/leorcvargas/bgeraser/internal/infra/storage"
-	"github.com/leorcvargas/bgeraser/internal/infra/worker"
-	"go.uber.org/fx"
+	processinworker "github.com/leorcvargas/bgeraser/internal/infra/worker/process_in"
+	processoutworker "github.com/leorcvargas/bgeraser/internal/infra/worker/process_out"
 
 	_ "go.uber.org/automaxprocs"
+	"go.uber.org/fx"
 )
 
 func main() {
@@ -30,7 +31,8 @@ func main() {
 		images.Module,
 		httpapi.Module,
 		storage.Module,
-		worker.Module,
+		processinworker.Module,
+		processoutworker.Module,
 	)
 
 	app.Run()

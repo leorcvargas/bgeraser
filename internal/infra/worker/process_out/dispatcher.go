@@ -1,44 +1,44 @@
-package worker
+package processoutworker
 
 import (
 	"github.com/leorcvargas/bgeraser/internal/domain/images"
 	"github.com/leorcvargas/bgeraser/internal/infra/config"
 )
 
-type Dispatcher struct {
+type ProcessOutDispatcher struct {
 	// A pool of workers channels that are registered with the dispatcher
-	WorkerPool chan chan images.Job
-	jobQueue   chan images.Job
+	WorkerPool chan chan images.ProcessOutJob
+	jobQueue   chan images.ProcessOutJob
 	repository images.Repository
 	config     *config.Config
 	maxWorkers int
 }
 
-func (d *Dispatcher) Run() {
+func (d *ProcessOutDispatcher) Run() {
 	// starting n number of workers
 	for i := 0; i < d.maxWorkers; i++ {
-		worker := NewWorker(d.WorkerPool, d.repository, d.config)
+		worker := NewWorker(d.WorkerPool, d.repository)
 		worker.Start()
 	}
 
 	go d.dispatch()
 }
 
-func (d *Dispatcher) dispatch() {
+func (d *ProcessOutDispatcher) dispatch() {
 	for job := range d.jobQueue {
-		go func(job images.Job) {
+		go func(job images.ProcessOutJob) {
 			jobChannel := <-d.WorkerPool
 			jobChannel <- job
 		}(job)
 	}
 }
 
-func NewDispatcher(jobQueue images.JobQueue, repository images.Repository, config *config.Config) *Dispatcher {
+func NewDispatcher(jobQueue images.ProcessOutJobQueue, repository images.Repository, config *config.Config) *ProcessOutDispatcher {
 	maxWorkers := MaxWorker
 
-	pool := make(chan chan images.Job, maxWorkers)
+	pool := make(chan chan images.ProcessOutJob, maxWorkers)
 
-	return &Dispatcher{
+	return &ProcessOutDispatcher{
 		WorkerPool: pool,
 		maxWorkers: maxWorkers,
 		jobQueue:   jobQueue,
