@@ -6,6 +6,7 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
@@ -41,6 +42,12 @@ func loadMiddlewares(r *fiber.App) {
 	// r.Use(recover.New())
 	// TODO uncomment later
 	// r.Use(csrf.New())
+
+	// TODO CONFIGURE THIS THING THE RIGHT WAY
+	r.Use(cors.New(cors.Config{
+		AllowMethods: "*",
+		AllowOrigins: "*",
+	}))
 	r.Use(etag.New())
 	r.Use(helmet.New())
 	r.Use(limiter.New(limiter.Config{Max: 25}))

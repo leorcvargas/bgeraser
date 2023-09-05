@@ -124,6 +124,16 @@ func (p *PostgresImageRepository) FindProcess(processID uuid.UUID,
 		resultID = &result.ResultID
 	}
 
+	var processOrigin *entities.Image
+	if result.Edges.Origin != nil {
+		processOrigin = p.mapImageToDomain(result.Edges.Origin)
+	}
+
+	var processResult *entities.Image
+	if result.Edges.Result != nil {
+		processResult = p.mapImageToDomain(result.Edges.Result)
+	}
+
 	entity := entities.NewImageProcess(
 		result.ID,
 		result.ImageID,
@@ -132,8 +142,8 @@ func (p *PostgresImageRepository) FindProcess(processID uuid.UUID,
 		result.FinishedAt,
 		result.ErroredAt,
 		result.ErrorReason,
-		p.mapImageToDomain(result.Edges.Origin),
-		p.mapImageToDomain(result.Edges.Result),
+		processOrigin,
+		processResult,
 	)
 
 	return entity, nil
