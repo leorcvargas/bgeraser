@@ -33,7 +33,11 @@ func (i *ImageProcess) SetError(err error) {
 	i.ErrorReason = &errorReason
 }
 
-func (i *ImageProcess) FinishProcess(resultFilename string, resultSize int64) error {
+func (i *ImageProcess) FinishProcess(
+	resultFilename string,
+	resultSize int64,
+	url string,
+) error {
 	if i.Result == nil {
 		return domainerrors.ErrImageProcessEmptyResult
 	}
@@ -42,6 +46,7 @@ func (i *ImageProcess) FinishProcess(resultFilename string, resultSize int64) er
 
 	i.FinishedAt = &now
 	i.Result.SetStatInfo(resultFilename, resultSize)
+	i.Result.SetURL(url)
 
 	return nil
 }

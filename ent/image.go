@@ -24,6 +24,8 @@ type Image struct {
 	Size int64 `json:"size,omitempty"`
 	// OriginalFilename holds the value of the "original_filename" field.
 	OriginalFilename string `json:"original_filename,omitempty"`
+	// URL holds the value of the "url" field.
+	URL string `json:"url,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
@@ -72,7 +74,7 @@ func (*Image) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case image.FieldSize:
 			values[i] = new(sql.NullInt64)
-		case image.FieldFormat, image.FieldOriginalFilename:
+		case image.FieldFormat, image.FieldOriginalFilename, image.FieldURL:
 			values[i] = new(sql.NullString)
 		case image.FieldCreatedAt, image.FieldUpdatedAt, image.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
@@ -116,6 +118,12 @@ func (i *Image) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field original_filename", values[j])
 			} else if value.Valid {
 				i.OriginalFilename = value.String
+			}
+		case image.FieldURL:
+			if value, ok := values[j].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field url", values[j])
+			} else if value.Valid {
+				i.URL = value.String
 			}
 		case image.FieldCreatedAt:
 			if value, ok := values[j].(*sql.NullTime); !ok {
@@ -190,6 +198,9 @@ func (i *Image) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("original_filename=")
 	builder.WriteString(i.OriginalFilename)
+	builder.WriteString(", ")
+	builder.WriteString("url=")
+	builder.WriteString(i.URL)
 	builder.WriteString(", ")
 	builder.WriteString("created_at=")
 	builder.WriteString(i.CreatedAt.Format(time.ANSIC))

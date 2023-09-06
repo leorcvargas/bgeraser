@@ -14,6 +14,7 @@ var (
 		{Name: "format", Type: field.TypeString},
 		{Name: "size", Type: field.TypeInt64},
 		{Name: "original_filename", Type: field.TypeString},
+		{Name: "url", Type: field.TypeString},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},

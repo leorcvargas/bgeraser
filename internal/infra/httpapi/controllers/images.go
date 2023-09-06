@@ -37,7 +37,8 @@ func (i *ImagesController) Create(c *fiber.Ctx) error {
 	files := form.File["images"]
 
 	if len(files) == 0 {
-		return c.Status(http.StatusBadRequest).JSON(ErrResponse{Message: "Missing files"})
+		return c.Status(http.StatusBadRequest).
+			JSON(ErrResponse{Message: "Missing files"})
 	}
 
 	result := make([]string, 0)
@@ -59,13 +60,15 @@ func (i *ImagesController) Create(c *fiber.Ctx) error {
 		saveFileErr := c.SaveFileToStorage(file, image.Filename(), i.storage)
 		if saveFileErr != nil {
 			log.Errorw("error saving file to disk: %w", saveFileErr)
-			return c.Status(http.StatusInternalServerError).JSON(InternalServerErrResponse)
+			return c.Status(http.StatusInternalServerError).
+				JSON(InternalServerErrResponse)
 		}
 
 		saveErr := i.save.Exec(image)
 		if saveErr != nil {
 			log.Errorw("error saving file info: %w", saveErr)
-			return c.Status(http.StatusInternalServerError).JSON(InternalServerErrResponse)
+			return c.Status(http.StatusInternalServerError).
+				JSON(InternalServerErrResponse)
 		}
 
 		result = append(result, image.ID.String())
@@ -91,7 +94,10 @@ func (i *ImagesController) CreateProcess(c *fiber.Ctx) error {
 		})
 	}
 
-	process, err := i.createProcess.Exec(parsedID, entities.ImageProcessKindRemoveBackground)
+	process, err := i.createProcess.Exec(
+		parsedID,
+		entities.ImageProcessKindRemoveBackground,
+	)
 	if err != nil {
 		if errors.Is(err, domainerrors.ErrImageNotFound) {
 			return c.Status(http.StatusNotFound).JSON(ErrResponse{
@@ -101,7 +107,8 @@ func (i *ImagesController) CreateProcess(c *fiber.Ctx) error {
 
 		log.Errorf("Error creating process: %s", err.Error())
 
-		return c.Status(http.StatusInternalServerError).JSON(InternalServerErrResponse)
+		return c.Status(http.StatusInternalServerError).
+			JSON(InternalServerErrResponse)
 	}
 
 	return c.Status(http.StatusOK).JSON(Response{Data: process.ID})
@@ -127,17 +134,24 @@ func (i *ImagesController) GetProcess(c *fiber.Ctx) error {
 
 		log.Errorf("Error getting process: %s", err.Error())
 
-		return c.Status(http.StatusInternalServerError).JSON(InternalServerErrResponse)
+		return c.Status(http.StatusInternalServerError).
+			JSON(InternalServerErrResponse)
 	}
 
 	return c.Status(http.StatusOK).JSON(Response{Data: process})
 }
 
-func (i *ImagesController) validateUpload(formFile *multipart.FileHeader) error {
+func (i *ImagesController) validateUpload(
+	formFile *multipart.FileHeader,
+) error {
 	contentType := formFile.Header.Get("Content-Type")
 	size := formFile.Size
 
-	log.Infof("Validating file upload with content type %s and size %d", contentType, size)
+	log.Infof(
+		"Validating file upload with content type %s and size %d",
+		contentType,
+		size,
+	)
 
 	if contentType != "image/png" && contentType != "image/jpeg" {
 		return ErrInvalidFileType

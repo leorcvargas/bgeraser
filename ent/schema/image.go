@@ -22,6 +22,7 @@ func (Image) Fields() []ent.Field {
 		field.String("format").NotEmpty().Immutable(),
 		field.Int64("size").Positive().Immutable(),
 		field.String("original_filename").NotEmpty().Immutable(),
+		field.String("url").NotEmpty().Immutable(),
 		field.Time("created_at").Immutable().Default(time.Now),
 		field.Time("updated_at").Default(time.Now).UpdateDefault(time.Now),
 		field.Time("deleted_at").Nillable().Optional(),

@@ -13,6 +13,7 @@ type Config struct {
 	Storage struct {
 		LocalPath string
 		Bucket    string
+		BucketURL string
 	}
 	AWS       struct{ Region string }
 	Profiling struct {
@@ -66,9 +67,11 @@ func NewConfig() *Config {
 		Storage: struct {
 			LocalPath string
 			Bucket    string
+			BucketURL string
 		}{
 			LocalPath: env.GetEnvOrDie("STORAGE_LOCAL_PATH"),
 			Bucket:    env.GetEnvOrDie("STORAGE_BUCKET"),
+			BucketURL: env.GetEnvOrDie("STORAGE_BUCKET_URL"),
 		},
 
 		AWS: struct {

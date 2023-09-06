@@ -13,6 +13,7 @@ type Image struct {
 	DeletedAt        *time.Time `json:"-"`
 	Format           string     `json:"format"`
 	OriginalFilename string     `json:"originalFilename"`
+	URL              string     `json:"url"`
 	Size             int64      `json:"size"`
 	ID               uuid.UUID  `json:"id"`
 }
@@ -28,6 +29,15 @@ func (i *Image) Filename() string {
 func (i *Image) SetStatInfo(name string, size int64) {
 	i.Size = size
 	i.OriginalFilename = name
+	i.UpdatedAt = time.Now()
+}
+
+func (i *Image) SetURL(url string) {
+	i.URL = url
+	i.refreshUpdatedAt()
+}
+
+func (i *Image) refreshUpdatedAt() {
 	i.UpdatedAt = time.Now()
 }
 
@@ -64,6 +74,7 @@ func NewImage(
 	format string,
 	size int64,
 	originalFilename string,
+	url string,
 	createdAt time.Time,
 	updatedAt time.Time,
 	deletedAt *time.Time,
@@ -73,6 +84,7 @@ func NewImage(
 		Format:           format,
 		Size:             size,
 		OriginalFilename: originalFilename,
+		URL:              url,
 		CreatedAt:        createdAt,
 		UpdatedAt:        updatedAt,
 		DeletedAt:        deletedAt,

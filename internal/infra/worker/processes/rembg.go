@@ -111,7 +111,12 @@ func (r *RemoveBackgroundProcess) finish() error {
 		return err
 	}
 
-	if err := r.imageProcess.FinishProcess(stat.Name(), stat.Size()); err != nil {
+	url := fmt.Sprintf(
+		"%s/%s",
+		r.config.Storage.BucketURL,
+		r.imageProcess.Result.Filename(),
+	)
+	if err := r.imageProcess.FinishProcess(stat.Name(), stat.Size(), url); err != nil {
 		return err
 	}
 

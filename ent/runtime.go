@@ -29,12 +29,16 @@ func init() {
 	imageDescOriginalFilename := imageFields[3].Descriptor()
 	// image.OriginalFilenameValidator is a validator for the "original_filename" field. It is called by the builders before save.
 	image.OriginalFilenameValidator = imageDescOriginalFilename.Validators[0].(func(string) error)
+	// imageDescURL is the schema descriptor for url field.
+	imageDescURL := imageFields[4].Descriptor()
+	// image.URLValidator is a validator for the "url" field. It is called by the builders before save.
+	image.URLValidator = imageDescURL.Validators[0].(func(string) error)
 	// imageDescCreatedAt is the schema descriptor for created_at field.
-	imageDescCreatedAt := imageFields[4].Descriptor()
+	imageDescCreatedAt := imageFields[5].Descriptor()
 	// image.DefaultCreatedAt holds the default value on creation for the created_at field.
 	image.DefaultCreatedAt = imageDescCreatedAt.Default.(func() time.Time)
 	// imageDescUpdatedAt is the schema descriptor for updated_at field.
-	imageDescUpdatedAt := imageFields[5].Descriptor()
+	imageDescUpdatedAt := imageFields[6].Descriptor()
 	// image.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	image.DefaultUpdatedAt = imageDescUpdatedAt.Default.(func() time.Time)
 	// image.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.

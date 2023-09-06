@@ -21,6 +21,8 @@ const (
 	FieldSize = "size"
 	// FieldOriginalFilename holds the string denoting the original_filename field in the database.
 	FieldOriginalFilename = "original_filename"
+	// FieldURL holds the string denoting the url field in the database.
+	FieldURL = "url"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -52,6 +54,7 @@ var Columns = []string{
 	FieldFormat,
 	FieldSize,
 	FieldOriginalFilename,
+	FieldURL,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldDeletedAt,
@@ -80,6 +83,8 @@ var (
 	SizeValidator func(int64) error
 	// OriginalFilenameValidator is a validator for the "original_filename" field. It is called by the builders before save.
 	OriginalFilenameValidator func(string) error
+	// URLValidator is a validator for the "url" field. It is called by the builders before save.
+	URLValidator func(string) error
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
@@ -111,6 +116,11 @@ func BySize(opts ...sql.OrderTermOption) OrderOption {
 // ByOriginalFilename orders the results by the original_filename field.
 func ByOriginalFilename(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldOriginalFilename, opts...).ToFunc()
+}
+
+// ByURL orders the results by the url field.
+func ByURL(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldURL, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

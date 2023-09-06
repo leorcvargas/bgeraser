@@ -50,15 +50,27 @@ func TestNewImageProcess(t *testing.T) {
 	}
 
 	if got.FinishedAt != &finishedAt {
-		t.Errorf("expected FinishedAt to be %v, got %v", finishedAt, got.FinishedAt)
+		t.Errorf(
+			"expected FinishedAt to be %v, got %v",
+			finishedAt,
+			got.FinishedAt,
+		)
 	}
 
 	if got.ErroredAt != &erroredAt {
-		t.Errorf("expected ErroredAt to be %v, got %v", erroredAt, got.ErroredAt)
+		t.Errorf(
+			"expected ErroredAt to be %v, got %v",
+			erroredAt,
+			got.ErroredAt,
+		)
 	}
 
 	if got.ErrorReason != &errorReason {
-		t.Errorf("expected ErrorReason to be %v, got %v", errorReason, got.ErrorReason)
+		t.Errorf(
+			"expected ErrorReason to be %v, got %v",
+			errorReason,
+			got.ErrorReason,
+		)
 	}
 }
 
@@ -126,7 +138,11 @@ func TestImageProcess_FinishProcess(t *testing.T) {
 	)
 	got.StartProcess()
 
-	err := got.FinishProcess("fake-file", 1024)
+	err := got.FinishProcess(
+		"fake-file",
+		1024,
+		"https://fake.url.com/image.png",
+	)
 	if err != nil {
 		t.Errorf("expected err to be nil, got %v", err)
 	}
@@ -136,11 +152,19 @@ func TestImageProcess_FinishProcess(t *testing.T) {
 	}
 
 	if got.ErroredAt != &erroredAt {
-		t.Errorf("expected ErroredAt to be %v, got %v", erroredAt, got.ErroredAt)
+		t.Errorf(
+			"expected ErroredAt to be %v, got %v",
+			erroredAt,
+			got.ErroredAt,
+		)
 	}
 
 	if got.ErrorReason != &errorReason {
-		t.Errorf("expected ErrorReason to be %v, got %v", errorReason, got.ErrorReason)
+		t.Errorf(
+			"expected ErrorReason to be %v, got %v",
+			errorReason,
+			got.ErrorReason,
+		)
 	}
 }
 
@@ -151,7 +175,11 @@ func TestImageProcess_SetFinish_Error(t *testing.T) {
 
 	sut := entities.ImageProcess{}
 
-	err := sut.FinishProcess("fake-result", 1024)
+	err := sut.FinishProcess(
+		"fake-result",
+		1024,
+		"https://fake.url.com/image.png",
+	)
 	if !errors.Is(err, expected) {
 		t.Errorf("expected err to be %v, got %v", expected, err)
 	}
@@ -172,7 +200,11 @@ func TestImageProcess_SetError(t *testing.T) {
 	}
 
 	if *sut.ErrorReason != errorReason {
-		t.Errorf("expected ErrorReason to be %v, got %v", errorReason, *sut.ErrorReason)
+		t.Errorf(
+			"expected ErrorReason to be %v, got %v",
+			errorReason,
+			*sut.ErrorReason,
+		)
 	}
 }
 

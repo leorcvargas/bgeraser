@@ -40,6 +40,7 @@ type ImageMutation struct {
 	size                   *int64
 	addsize                *int64
 	original_filename      *string
+	url                    *string
 	created_at             *time.Time
 	updated_at             *time.Time
 	deleted_at             *time.Time
@@ -285,6 +286,42 @@ func (m *ImageMutation) OldOriginalFilename(ctx context.Context) (v string, err 
 // ResetOriginalFilename resets all changes to the "original_filename" field.
 func (m *ImageMutation) ResetOriginalFilename() {
 	m.original_filename = nil
+}
+
+// SetURL sets the "url" field.
+func (m *ImageMutation) SetURL(s string) {
+	m.url = &s
+}
+
+// URL returns the value of the "url" field in the mutation.
+func (m *ImageMutation) URL() (r string, exists bool) {
+	v := m.url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldURL returns the old "url" field's value of the Image entity.
+// If the Image object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ImageMutation) OldURL(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldURL: %w", err)
+	}
+	return oldValue.URL, nil
+}
+
+// ResetURL resets all changes to the "url" field.
+func (m *ImageMutation) ResetURL() {
+	m.url = nil
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -550,7 +587,7 @@ func (m *ImageMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ImageMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.format != nil {
 		fields = append(fields, image.FieldFormat)
 	}
@@ -559,6 +596,9 @@ func (m *ImageMutation) Fields() []string {
 	}
 	if m.original_filename != nil {
 		fields = append(fields, image.FieldOriginalFilename)
+	}
+	if m.url != nil {
+		fields = append(fields, image.FieldURL)
 	}
 	if m.created_at != nil {
 		fields = append(fields, image.FieldCreatedAt)
@@ -583,6 +623,8 @@ func (m *ImageMutation) Field(name string) (ent.Value, bool) {
 		return m.Size()
 	case image.FieldOriginalFilename:
 		return m.OriginalFilename()
+	case image.FieldURL:
+		return m.URL()
 	case image.FieldCreatedAt:
 		return m.CreatedAt()
 	case image.FieldUpdatedAt:
@@ -604,6 +646,8 @@ func (m *ImageMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldSize(ctx)
 	case image.FieldOriginalFilename:
 		return m.OldOriginalFilename(ctx)
+	case image.FieldURL:
+		return m.OldURL(ctx)
 	case image.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case image.FieldUpdatedAt:
@@ -639,6 +683,13 @@ func (m *ImageMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetOriginalFilename(v)
+		return nil
+	case image.FieldURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetURL(v)
 		return nil
 	case image.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -742,6 +793,9 @@ func (m *ImageMutation) ResetField(name string) error {
 		return nil
 	case image.FieldOriginalFilename:
 		m.ResetOriginalFilename()
+		return nil
+	case image.FieldURL:
+		m.ResetURL()
 		return nil
 	case image.FieldCreatedAt:
 		m.ResetCreatedAt()

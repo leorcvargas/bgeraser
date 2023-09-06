@@ -40,6 +40,12 @@ func (ic *ImageCreate) SetOriginalFilename(s string) *ImageCreate {
 	return ic
 }
 
+// SetURL sets the "url" field.
+func (ic *ImageCreate) SetURL(s string) *ImageCreate {
+	ic.mutation.SetURL(s)
+	return ic
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (ic *ImageCreate) SetCreatedAt(t time.Time) *ImageCreate {
 	ic.mutation.SetCreatedAt(t)
@@ -201,6 +207,14 @@ func (ic *ImageCreate) check() error {
 			return &ValidationError{Name: "original_filename", err: fmt.Errorf(`ent: validator failed for field "Image.original_filename": %w`, err)}
 		}
 	}
+	if _, ok := ic.mutation.URL(); !ok {
+		return &ValidationError{Name: "url", err: errors.New(`ent: missing required field "Image.url"`)}
+	}
+	if v, ok := ic.mutation.URL(); ok {
+		if err := image.URLValidator(v); err != nil {
+			return &ValidationError{Name: "url", err: fmt.Errorf(`ent: validator failed for field "Image.url": %w`, err)}
+		}
+	}
 	if _, ok := ic.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Image.created_at"`)}
 	}
@@ -253,6 +267,10 @@ func (ic *ImageCreate) createSpec() (*Image, *sqlgraph.CreateSpec) {
 	if value, ok := ic.mutation.OriginalFilename(); ok {
 		_spec.SetField(image.FieldOriginalFilename, field.TypeString, value)
 		_node.OriginalFilename = value
+	}
+	if value, ok := ic.mutation.URL(); ok {
+		_spec.SetField(image.FieldURL, field.TypeString, value)
+		_node.URL = value
 	}
 	if value, ok := ic.mutation.CreatedAt(); ok {
 		_spec.SetField(image.FieldCreatedAt, field.TypeTime, value)

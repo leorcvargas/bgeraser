@@ -71,6 +71,11 @@ func OriginalFilename(v string) predicate.Image {
 	return predicate.Image(sql.FieldEQ(FieldOriginalFilename, v))
 }
 
+// URL applies equality check predicate on the "url" field. It's identical to URLEQ.
+func URL(v string) predicate.Image {
+	return predicate.Image(sql.FieldEQ(FieldURL, v))
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Image {
 	return predicate.Image(sql.FieldEQ(FieldCreatedAt, v))
@@ -254,6 +259,71 @@ func OriginalFilenameEqualFold(v string) predicate.Image {
 // OriginalFilenameContainsFold applies the ContainsFold predicate on the "original_filename" field.
 func OriginalFilenameContainsFold(v string) predicate.Image {
 	return predicate.Image(sql.FieldContainsFold(FieldOriginalFilename, v))
+}
+
+// URLEQ applies the EQ predicate on the "url" field.
+func URLEQ(v string) predicate.Image {
+	return predicate.Image(sql.FieldEQ(FieldURL, v))
+}
+
+// URLNEQ applies the NEQ predicate on the "url" field.
+func URLNEQ(v string) predicate.Image {
+	return predicate.Image(sql.FieldNEQ(FieldURL, v))
+}
+
+// URLIn applies the In predicate on the "url" field.
+func URLIn(vs ...string) predicate.Image {
+	return predicate.Image(sql.FieldIn(FieldURL, vs...))
+}
+
+// URLNotIn applies the NotIn predicate on the "url" field.
+func URLNotIn(vs ...string) predicate.Image {
+	return predicate.Image(sql.FieldNotIn(FieldURL, vs...))
+}
+
+// URLGT applies the GT predicate on the "url" field.
+func URLGT(v string) predicate.Image {
+	return predicate.Image(sql.FieldGT(FieldURL, v))
+}
+
+// URLGTE applies the GTE predicate on the "url" field.
+func URLGTE(v string) predicate.Image {
+	return predicate.Image(sql.FieldGTE(FieldURL, v))
+}
+
+// URLLT applies the LT predicate on the "url" field.
+func URLLT(v string) predicate.Image {
+	return predicate.Image(sql.FieldLT(FieldURL, v))
+}
+
+// URLLTE applies the LTE predicate on the "url" field.
+func URLLTE(v string) predicate.Image {
+	return predicate.Image(sql.FieldLTE(FieldURL, v))
+}
+
+// URLContains applies the Contains predicate on the "url" field.
+func URLContains(v string) predicate.Image {
+	return predicate.Image(sql.FieldContains(FieldURL, v))
+}
+
+// URLHasPrefix applies the HasPrefix predicate on the "url" field.
+func URLHasPrefix(v string) predicate.Image {
+	return predicate.Image(sql.FieldHasPrefix(FieldURL, v))
+}
+
+// URLHasSuffix applies the HasSuffix predicate on the "url" field.
+func URLHasSuffix(v string) predicate.Image {
+	return predicate.Image(sql.FieldHasSuffix(FieldURL, v))
+}
+
+// URLEqualFold applies the EqualFold predicate on the "url" field.
+func URLEqualFold(v string) predicate.Image {
+	return predicate.Image(sql.FieldEqualFold(FieldURL, v))
+}
+
+// URLContainsFold applies the ContainsFold predicate on the "url" field.
+func URLContainsFold(v string) predicate.Image {
+	return predicate.Image(sql.FieldContainsFold(FieldURL, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.

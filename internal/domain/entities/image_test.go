@@ -37,7 +37,11 @@ func TestCreateImage(t *testing.T) {
 
 		t.Run(tC.desc, func(t *testing.T) {
 			t.Parallel()
-			image := entities.CreateImage(tC.originalFilename, tC.format, tC.size)
+			image := entities.CreateImage(
+				tC.originalFilename,
+				tC.format,
+				tC.size,
+			)
 
 			if image == nil {
 				t.Error("expected image to not be nil")
@@ -54,7 +58,11 @@ func TestCreateImage(t *testing.T) {
 			}
 
 			if image.Size != tC.size {
-				t.Errorf("expected image.Size to match %d, got %d", tC.size, image.Size)
+				t.Errorf(
+					"expected image.Size to match %d, got %d",
+					tC.size,
+					image.Size,
+				)
 			}
 
 			if image.CreatedAt.IsZero() {
@@ -75,6 +83,7 @@ func TestNewImage(t *testing.T) {
 	format := "application/jpeg"
 	size := int64(3412894)
 	originalFilename := "testfile.jpeg"
+	url := "https://fake.url.com/image1.jpeg"
 	createdAt := time.Now()
 	updatedAt := time.Now()
 
@@ -83,6 +92,7 @@ func TestNewImage(t *testing.T) {
 		format,
 		size,
 		originalFilename,
+		url,
 		createdAt,
 		updatedAt,
 		nil,
@@ -113,12 +123,28 @@ func TestNewImage(t *testing.T) {
 		)
 	}
 
+	if got.URL != url {
+		t.Errorf(
+			"expected image.URL to match %s, got %s",
+			url,
+			got.URL,
+		)
+	}
+
 	if got.CreatedAt != createdAt {
-		t.Errorf("expected CreatedAt to match %v, got %v", createdAt, got.CreatedAt)
+		t.Errorf(
+			"expected CreatedAt to match %v, got %v",
+			createdAt,
+			got.CreatedAt,
+		)
 	}
 
 	if got.UpdatedAt != updatedAt {
-		t.Errorf("expected UpdatedAt to match %v, got %v", updatedAt, got.UpdatedAt)
+		t.Errorf(
+			"expected UpdatedAt to match %v, got %v",
+			updatedAt,
+			got.UpdatedAt,
+		)
 	}
 
 	if got.DeletedAt != nil {
@@ -135,13 +161,21 @@ func TestImage_Extension(t *testing.T) {
 		expected string
 	}{
 		{
-			desc:     "return PNG file extension",
-			sut:      entities.CreateImage("testfile.png", "image/png", int64(1024)),
+			desc: "return PNG file extension",
+			sut: entities.CreateImage(
+				"testfile.png",
+				"image/png",
+				int64(1024),
+			),
 			expected: "png",
 		},
 		{
-			desc:     "return JPEG file extension",
-			sut:      entities.CreateImage("testfile.jpeg", "image/jpeg", int64(1024)),
+			desc: "return JPEG file extension",
+			sut: entities.CreateImage(
+				"testfile.jpeg",
+				"image/jpeg",
+				int64(1024),
+			),
 			expected: "jpeg",
 		},
 	}
@@ -170,13 +204,21 @@ func TestImage_Filename(t *testing.T) {
 		sufix string
 	}{
 		{
-			desc:  "return filename for PNG file",
-			sut:   entities.CreateImage("testfile.png", "image/png", int64(1024)),
+			desc: "return filename for PNG file",
+			sut: entities.CreateImage(
+				"testfile.png",
+				"image/png",
+				int64(1024),
+			),
 			sufix: "png",
 		},
 		{
-			desc:  "return filename for JPEG file",
-			sut:   entities.CreateImage("testfile.jpeg", "image/jpeg", int64(1024)),
+			desc: "return filename for JPEG file",
+			sut: entities.CreateImage(
+				"testfile.jpeg",
+				"image/jpeg",
+				int64(1024),
+			),
 			sufix: "jpeg",
 		},
 	}
