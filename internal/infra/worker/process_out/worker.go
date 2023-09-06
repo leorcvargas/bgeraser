@@ -25,11 +25,19 @@ func (w Worker) Start() {
 			log.Debugf("process out worker received data", data)
 
 			if data.Err != nil {
-				log.Errorw("error while executing process", data.Err, data.Payload)
+				log.Errorw(
+					"error while executing process",
+					data.Err,
+					data.Payload,
+				)
 
 				err := w.repository.UpdateProcessOnError(&data.Payload)
 				if err != nil {
-					log.Warnw("failed to update process", data.Err, data.Payload)
+					log.Warnw(
+						"failed to update process",
+						data.Err,
+						data.Payload,
+					)
 				}
 
 				return
@@ -65,7 +73,10 @@ func (w Worker) bootstrap(dataCh chan images.ProcessOutJob) {
 	}
 }
 
-func NewWorker(workerPool chan chan images.ProcessOutJob, repository images.Repository) Worker {
+func NewWorker(
+	workerPool chan chan images.ProcessOutJob,
+	repository images.Repository,
+) Worker {
 	return Worker{
 		WorkerPool:           workerPool,
 		ProcessOutJobChannel: make(chan images.ProcessOutJob),

@@ -2,24 +2,35 @@ package processes
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
-	"strings"
 
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/leorcvargas/bgeraser/internal/domain/entities"
+	"github.com/leorcvargas/bgeraser/internal/domain/images"
 	"github.com/leorcvargas/bgeraser/internal/infra/config"
 )
 
 type RemoveBackgroundProcess struct {
 	config       *config.Config
 	imageProcess entities.ImageProcess
+	storage      images.Storage
 }
 
 func (r *RemoveBackgroundProcess) Exec() (*entities.ImageProcess, error) {
+	log.Debugw("starting remove background process", r.imageProcess)
 	r.imageProcess.StartProcess()
 
+	if err := r.downloadImage(); err != nil {
+		return nil, r.handleError(err)
+	}
+
 	if err := r.runCommand(); err != nil {
+		return nil, r.handleError(err)
+	}
+
+	if err := r.uploadResultImage(); err != nil {
 		return nil, r.handleError(err)
 	}
 
@@ -27,7 +38,52 @@ func (r *RemoveBackgroundProcess) Exec() (*entities.ImageProcess, error) {
 		return nil, r.handleError(err)
 	}
 
+	go r.cleanup()
+
 	return &r.imageProcess, nil
+}
+
+func (r *RemoveBackgroundProcess) downloadImage() error {
+	content, err := r.storage.Get(r.imageProcess.Image.Filename())
+	if err != nil {
+		return err
+	}
+
+	workingdir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	file, err := os.Create(
+		workingdir + "/" + r.config.Storage.LocalPath + "/" + r.imageProcess.Image.Filename(),
+	)
+	if err != nil {
+		return err
+	}
+
+	_, err = file.Write(content)
+
+	return err
+}
+
+func (r *RemoveBackgroundProcess) uploadResultImage() error {
+	workingdir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	file, err := os.ReadFile(
+		workingdir + "/" + r.config.Storage.LocalPath + "/" + r.imageProcess.Result.Filename(),
+	)
+	if err != nil {
+		return err
+	}
+
+	if err = r.storage.Upload(r.imageProcess.Result.Filename(), file); err != nil {
+		return err
+	}
+
+	return err
 }
 
 func (r *RemoveBackgroundProcess) handleError(err error) error {
@@ -37,12 +93,14 @@ func (r *RemoveBackgroundProcess) handleError(err error) error {
 }
 
 func (r *RemoveBackgroundProcess) finish() error {
-	workingdir, err := os.Getwd()
+	resultFileLocalPath, err := r.buildFileLocalPath(
+		r.imageProcess.Result.Filename(),
+	)
 	if err != nil {
 		return err
 	}
 
-	file, err := os.Open(workingdir + "/" + r.config.Storage.LocalPath + "/" + r.imageProcess.Result.Filename())
+	file, err := os.Open(resultFileLocalPath)
 	if err != nil {
 		return err
 	}
@@ -53,7 +111,38 @@ func (r *RemoveBackgroundProcess) finish() error {
 		return err
 	}
 
-	return r.imageProcess.FinishProcess(stat.Name(), stat.Size())
+	if err := r.imageProcess.FinishProcess(stat.Name(), stat.Size()); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *RemoveBackgroundProcess) cleanup() {
+	filenames := []string{
+		r.imageProcess.Image.Filename(),
+		r.imageProcess.Result.Filename(),
+	}
+
+	localPaths := make([]string, 0, len(filenames))
+	for _, filename := range filenames {
+		localPath, err := r.buildFileLocalPath(filename)
+		if err != nil {
+			log.Warnw("cleanup failed to build file local path", err)
+			continue
+		}
+
+		localPaths = append(localPaths, localPath)
+	}
+
+	for _, localPath := range localPaths {
+		if err := os.Remove(localPath); err != nil {
+			log.Warnf(
+				"cleanup failed to delete local file: %s",
+				localPath,
+			)
+		}
+	}
 }
 
 func (r *RemoveBackgroundProcess) runCommand() error {
@@ -75,7 +164,7 @@ func (r *RemoveBackgroundProcess) buildCommand() (*exec.Cmd, error) {
 		return nil, errors.New("RemoveBackgroundProcess.resultImage is empty")
 	}
 
-	workingdir, err := os.Getwd()
+	workdir, err := os.Getwd()
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +173,7 @@ func (r *RemoveBackgroundProcess) buildCommand() (*exec.Cmd, error) {
 		Path: "/bin/sh",
 		Args: []string{
 			"-c",
-			workingdir + "/scripts/rembg/run.sh",
+			workdir + "/scripts/rembg/run.sh",
 			r.imageProcess.Image.Filename(),
 			r.imageProcess.Result.Filename(),
 		},
@@ -92,11 +181,35 @@ func (r *RemoveBackgroundProcess) buildCommand() (*exec.Cmd, error) {
 		Stderr: os.Stderr,
 	}
 
-	log.Infof("command build: %s", strings.Join(cmd.Args, " "))
-
 	return cmd, nil
 }
 
-func NewRemoveBackgroundProcess(imageProcess entities.ImageProcess, config *config.Config) *RemoveBackgroundProcess {
-	return &RemoveBackgroundProcess{imageProcess: imageProcess, config: config}
+func (r *RemoveBackgroundProcess) buildFileLocalPath(
+	filename string,
+) (string, error) {
+	workdir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+
+	path := fmt.Sprintf(
+		"%s/%s/%s",
+		workdir,
+		r.config.Storage.LocalPath,
+		filename,
+	)
+
+	return path, nil
+}
+
+func NewRemoveBackgroundProcess(
+	imageProcess entities.ImageProcess,
+	config *config.Config,
+	storage images.Storage,
+) *RemoveBackgroundProcess {
+	return &RemoveBackgroundProcess{
+		imageProcess: imageProcess,
+		config:       config,
+		storage:      storage,
+	}
 }

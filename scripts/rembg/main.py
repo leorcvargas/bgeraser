@@ -22,7 +22,6 @@ def erase(input_path, output_path):
 
 
 def main():
-    print("[rembg] Starting script")
     try:
         args = parser.parse_args()
 
@@ -40,7 +39,6 @@ def main():
         erase(input_path, output_path)
 
     except Exception as err:
-        print("Failed to remove image's background: ", err)
         os._exit(1)
 
 

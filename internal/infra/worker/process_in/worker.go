@@ -16,6 +16,7 @@ type Worker struct {
 	quit                chan bool
 	config              *config.Config
 	repository          images.Repository
+	storage             images.Storage
 	outQueue            images.ProcessOutJobQueue
 }
 
@@ -27,7 +28,7 @@ func (w Worker) Start() {
 	go func() {
 		for data := range dataCh {
 			log.Debugf("worker received data", data)
-			process := processes.NewRemoveBackgroundProcess(data.Payload, w.config)
+			process := processes.NewRemoveBackgroundProcess(data.Payload, w.config, w.storage)
 
 			imageProcess, err := process.Exec()
 
@@ -64,6 +65,7 @@ func NewWorker(
 	repository images.Repository,
 	config *config.Config,
 	outQueue images.ProcessOutJobQueue,
+	storage images.Storage,
 ) Worker {
 	return Worker{
 		WorkerPool:          workerPool,
@@ -72,5 +74,6 @@ func NewWorker(
 		repository:          repository,
 		config:              config,
 		outQueue:            outQueue,
+		storage:             storage,
 	}
 }

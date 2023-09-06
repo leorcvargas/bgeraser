@@ -1,27 +1,26 @@
-FROM golang:1.21 as builder
+# Server builder
+FROM golang:1.21-alpine as server_builder
 
 WORKDIR /app
 
-# Copy Go module files
 COPY go.* ./
 
-# Download dependencies
 RUN go mod download
 
-# Copy source files
 COPY ./cmd ./cmd
 COPY ./internal ./internal
+COPY ./ent ./ent
 COPY ./pkg ./pkg
 
-# Build
 RUN go build -v -o ./bin/server ./cmd/server.go
 
+# Runtime
 FROM alpine:3.14.10
+
+WORKDIR /
 
 EXPOSE 8080
 
-# Copy files from builder stage
-COPY --from=builder /app/bin/server .
+COPY --from=server_builder /app/bin/server .
 
-# Run binary
 CMD ["/server"]

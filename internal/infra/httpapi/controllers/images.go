@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
 	"mime/multipart"
 	"net/http"
 
@@ -26,6 +25,7 @@ type ImagesController struct {
 	config        *config.Config
 	createProcess *images.CreateProcess
 	findProcess   *images.FindProcess
+	storage       fiber.Storage
 }
 
 func (i *ImagesController) Create(c *fiber.Ctx) error {
@@ -40,7 +40,7 @@ func (i *ImagesController) Create(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(ErrResponse{Message: "Missing files"})
 	}
 
-	result := make([]entities.Image, 0)
+	result := make([]string, 0)
 
 	for _, file := range files {
 		if err = i.validateUpload(file); err != nil {
@@ -54,21 +54,21 @@ func (i *ImagesController) Create(c *fiber.Ctx) error {
 			Format:   file.Header["Content-Type"][0],
 			Size:     file.Size,
 		}
-
 		image := i.create.Exec(input)
 
-		localPath := fmt.Sprintf("%s/%s", i.config.Storage.LocalPath, image.Filename())
-		if err := c.SaveFile(file, localPath); err != nil {
-			log.Errorw("error saving file to disk: %w", err)
+		saveFileErr := c.SaveFileToStorage(file, image.Filename(), i.storage)
+		if saveFileErr != nil {
+			log.Errorw("error saving file to disk: %w", saveFileErr)
 			return c.Status(http.StatusInternalServerError).JSON(InternalServerErrResponse)
 		}
 
-		if err := i.save.Exec(image); err != nil {
-			log.Errorw("error saving file info: %w", err)
+		saveErr := i.save.Exec(image)
+		if saveErr != nil {
+			log.Errorw("error saving file info: %w", saveErr)
 			return c.Status(http.StatusInternalServerError).JSON(InternalServerErrResponse)
 		}
 
-		result = append(result, *image)
+		result = append(result, image.ID.String())
 	}
 
 	return c.Status(http.StatusOK).JSON(Response{Data: result})
@@ -104,7 +104,7 @@ func (i *ImagesController) CreateProcess(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).JSON(InternalServerErrResponse)
 	}
 
-	return c.Status(http.StatusOK).JSON(Response{Data: process})
+	return c.Status(http.StatusOK).JSON(Response{Data: process.ID})
 }
 
 func (i *ImagesController) GetProcess(c *fiber.Ctx) error {
@@ -156,6 +156,7 @@ func NewImagesController(
 	save *images.Save,
 	createProcess *images.CreateProcess,
 	findProcess *images.FindProcess,
+	storage fiber.Storage,
 ) *ImagesController {
 	return &ImagesController{
 		config:        config,
@@ -163,5 +164,6 @@ func NewImagesController(
 		save:          save,
 		createProcess: createProcess,
 		findProcess:   findProcess,
+		storage:       storage,
 	}
 }

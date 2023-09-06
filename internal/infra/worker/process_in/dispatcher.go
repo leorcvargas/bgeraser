@@ -12,13 +12,20 @@ type ProcessInDispatcher struct {
 	outJobQueue images.ProcessOutJobQueue
 	repository  images.Repository
 	config      *config.Config
+	storage     images.Storage
 	maxWorkers  int
 }
 
 func (d *ProcessInDispatcher) Run() {
 	// starting n number of workers
 	for i := 0; i < d.maxWorkers; i++ {
-		worker := NewWorker(d.WorkerPool, d.repository, d.config, d.outJobQueue)
+		worker := NewWorker(
+			d.WorkerPool,
+			d.repository,
+			d.config,
+			d.outJobQueue,
+			d.storage,
+		)
 		worker.Start()
 	}
 
@@ -34,7 +41,13 @@ func (d *ProcessInDispatcher) dispatch() {
 	}
 }
 
-func NewDispatcher(jobQueue images.ProcessInJobQueue, outJobQueue images.ProcessOutJobQueue, repository images.Repository, config *config.Config) *ProcessInDispatcher {
+func NewDispatcher(
+	jobQueue images.ProcessInJobQueue,
+	outJobQueue images.ProcessOutJobQueue,
+	repository images.Repository,
+	config *config.Config,
+	storage images.Storage,
+) *ProcessInDispatcher {
 	maxWorkers := MaxWorker
 
 	pool := make(chan chan images.ProcessInJob, maxWorkers)
@@ -46,5 +59,6 @@ func NewDispatcher(jobQueue images.ProcessInJobQueue, outJobQueue images.Process
 		outJobQueue: outJobQueue,
 		repository:  repository,
 		config:      config,
+		storage:     storage,
 	}
 }

@@ -6,6 +6,7 @@ toolchain go1.21.0
 
 require (
 	entgo.io/ent v0.12.3
+	github.com/aws/aws-sdk-go v1.45.3
 	github.com/bytedance/sonic v1.10.0
 	github.com/gofiber/fiber/v2 v2.48.0
 	github.com/google/uuid v1.3.0
@@ -28,6 +29,7 @@ require (
 	github.com/hashicorp/hcl/v2 v2.13.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/klauspost/compress v1.16.3 // indirect
 	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect

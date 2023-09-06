@@ -10,21 +10,20 @@ type Config struct {
 		Password string
 		Name     string
 	}
-
+	Storage struct {
+		LocalPath string
+		Bucket    string
+	}
+	AWS       struct{ Region string }
+	Profiling struct {
+		CPU     string
+		Mem     string
+		Enabled bool
+	}
 	Server struct {
 		Port     string
 		UseSonic bool
 		Prefork  bool
-	}
-
-	Profiling struct {
-		Enabled bool
-		CPU     string
-		Mem     string
-	}
-
-	Storage struct {
-		LocalPath string
 	}
 }
 
@@ -55,9 +54,9 @@ func NewConfig() *Config {
 		},
 
 		Profiling: struct {
-			Enabled bool
 			CPU     string
 			Mem     string
+			Enabled bool
 		}{
 			Enabled: env.GetEnvOrDie("ENABLE_PROFILING") == "1",
 			CPU:     env.GetEnvOrDie("CPU_PROFILE"),
@@ -66,8 +65,16 @@ func NewConfig() *Config {
 
 		Storage: struct {
 			LocalPath string
+			Bucket    string
 		}{
 			LocalPath: env.GetEnvOrDie("STORAGE_LOCAL_PATH"),
+			Bucket:    env.GetEnvOrDie("STORAGE_BUCKET"),
+		},
+
+		AWS: struct {
+			Region string
+		}{
+			Region: env.GetEnvOrDie("AWS_REGION"),
 		},
 	}
 }
