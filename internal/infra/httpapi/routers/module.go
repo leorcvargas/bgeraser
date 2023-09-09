@@ -14,6 +14,7 @@ var Module = fx.Module("routers",
 	fx.Provide(
 		asRouter(NewPingRouter),
 		asRouter(NewImagesRouter),
+		asRouter(NewImageProcessesRouter),
 		fx.Annotate(
 			MakeRouter,
 			fx.ParamTags(`group:"routers"`),

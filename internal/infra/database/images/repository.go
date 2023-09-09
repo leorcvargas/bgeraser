@@ -1,4 +1,4 @@
-package imagesdb
+package images
 
 import (
 	"context"

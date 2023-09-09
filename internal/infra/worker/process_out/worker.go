@@ -2,21 +2,21 @@ package processoutworker
 
 import (
 	"github.com/gofiber/fiber/v2/log"
-	"github.com/leorcvargas/bgeraser/internal/domain/images"
+	"github.com/leorcvargas/bgeraser/internal/domain/imageprocesses"
 )
 
 var MaxWorker = 4
 
 // Worker represents the worker that executes the job
 type Worker struct {
-	WorkerPool           chan chan images.ProcessOutJob
-	ProcessOutJobChannel chan images.ProcessOutJob
+	WorkerPool           chan chan imageprocesses.ProcessOutJob
+	ProcessOutJobChannel chan imageprocesses.ProcessOutJob
 	quit                 chan bool
-	repository           images.Repository
+	repository           imageprocesses.Repository
 }
 
 func (w Worker) Start() {
-	dataCh := make(chan images.ProcessOutJob)
+	dataCh := make(chan imageprocesses.ProcessOutJob)
 
 	go w.bootstrap(dataCh)
 
@@ -59,7 +59,7 @@ func (w Worker) Stop() {
 	}()
 }
 
-func (w Worker) bootstrap(dataCh chan images.ProcessOutJob) {
+func (w Worker) bootstrap(dataCh chan imageprocesses.ProcessOutJob) {
 	for {
 		w.WorkerPool <- w.ProcessOutJobChannel
 
@@ -74,12 +74,12 @@ func (w Worker) bootstrap(dataCh chan images.ProcessOutJob) {
 }
 
 func NewWorker(
-	workerPool chan chan images.ProcessOutJob,
-	repository images.Repository,
+	workerPool chan chan imageprocesses.ProcessOutJob,
+	repository imageprocesses.Repository,
 ) Worker {
 	return Worker{
 		WorkerPool:           workerPool,
-		ProcessOutJobChannel: make(chan images.ProcessOutJob),
+		ProcessOutJobChannel: make(chan imageprocesses.ProcessOutJob),
 		quit:                 make(chan bool),
 		repository:           repository,
 	}

@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/joho/godotenv"
+	"github.com/leorcvargas/bgeraser/internal/domain/imageprocesses"
 	"github.com/leorcvargas/bgeraser/internal/domain/images"
 	"github.com/leorcvargas/bgeraser/internal/infra/config"
 	"github.com/leorcvargas/bgeraser/internal/infra/database"
@@ -29,6 +30,7 @@ func main() {
 		routers.Module,
 		database.Module,
 		images.Module,
+		imageprocesses.Module,
 		httpapi.Module,
 		storage.Module,
 		processinworker.Module,

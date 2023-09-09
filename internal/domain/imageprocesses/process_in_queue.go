@@ -1,4 +1,4 @@
-package images
+package imageprocesses
 
 import "github.com/leorcvargas/bgeraser/internal/domain/entities"
 

@@ -1,16 +1,16 @@
 package processinworker
 
 import (
+	"github.com/leorcvargas/bgeraser/internal/domain/imageprocesses"
 	"github.com/leorcvargas/bgeraser/internal/domain/images"
 	"github.com/leorcvargas/bgeraser/internal/infra/config"
 )
 
 type ProcessInDispatcher struct {
 	// A pool of workers channels that are registered with the dispatcher
-	WorkerPool  chan chan images.ProcessInJob
-	jobQueue    images.ProcessInJobQueue
-	outJobQueue images.ProcessOutJobQueue
-	repository  images.Repository
+	WorkerPool  chan chan imageprocesses.ProcessInJob
+	jobQueue    imageprocesses.ProcessInJobQueue
+	outJobQueue imageprocesses.ProcessOutJobQueue
 	config      *config.Config
 	storage     images.Storage
 	maxWorkers  int
@@ -21,7 +21,6 @@ func (d *ProcessInDispatcher) Run() {
 	for i := 0; i < d.maxWorkers; i++ {
 		worker := NewWorker(
 			d.WorkerPool,
-			d.repository,
 			d.config,
 			d.outJobQueue,
 			d.storage,
@@ -34,7 +33,7 @@ func (d *ProcessInDispatcher) Run() {
 
 func (d *ProcessInDispatcher) dispatch() {
 	for job := range d.jobQueue {
-		go func(job images.ProcessInJob) {
+		go func(job imageprocesses.ProcessInJob) {
 			jobChannel := <-d.WorkerPool
 			jobChannel <- job
 		}(job)
@@ -42,22 +41,20 @@ func (d *ProcessInDispatcher) dispatch() {
 }
 
 func NewDispatcher(
-	jobQueue images.ProcessInJobQueue,
-	outJobQueue images.ProcessOutJobQueue,
-	repository images.Repository,
+	jobQueue imageprocesses.ProcessInJobQueue,
+	outJobQueue imageprocesses.ProcessOutJobQueue,
 	config *config.Config,
 	storage images.Storage,
 ) *ProcessInDispatcher {
 	maxWorkers := MaxWorker
 
-	pool := make(chan chan images.ProcessInJob, maxWorkers)
+	pool := make(chan chan imageprocesses.ProcessInJob, maxWorkers)
 
 	return &ProcessInDispatcher{
 		WorkerPool:  pool,
 		maxWorkers:  maxWorkers,
 		jobQueue:    jobQueue,
 		outJobQueue: outJobQueue,
-		repository:  repository,
 		config:      config,
 		storage:     storage,
 	}
