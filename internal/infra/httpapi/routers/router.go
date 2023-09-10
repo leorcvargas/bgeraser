@@ -49,7 +49,7 @@ func loadMiddlewares(r *fiber.App) {
 	}))
 	r.Use(etag.New())
 	r.Use(helmet.New())
-	r.Use(limiter.New(limiter.Config{Max: 25}))
+	r.Use(limiter.New(limiter.Config{Max: 50}))
 
 	// Access log
 	r.Use(requestid.New())
