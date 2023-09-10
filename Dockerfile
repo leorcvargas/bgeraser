@@ -15,12 +15,18 @@ COPY ./pkg ./pkg
 RUN go build -v -o ./bin/server ./cmd/server.go
 
 # Runtime
-FROM alpine:3.14.10
+FROM python:3.11-slim
 
 WORKDIR /
 
-EXPOSE 8080
-
 COPY --from=server_builder /app/bin/server .
 
-CMD ["/server"]
+COPY ./data ./data
+
+COPY ./.env* .
+
+RUN pip3 install --no-cache-dir rembg[cli]
+
+EXPOSE 8080
+
+CMD ["/bin/sh", "-c", "/server"]

@@ -35,6 +35,7 @@ func main() {
 		storage.Module,
 		processinworker.Module,
 		processoutworker.Module,
+		fx.NopLogger,
 	)
 
 	app.Run()

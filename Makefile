@@ -13,14 +13,15 @@ clean:
 test:
 	go test -coverprofile=coverage.out -v ./...
 
-docker:
+dbuild:
 	docker build -t leorcvargas/bgeraser .
 
-docker-down:
+dcdown:
 	docker compose down -v --remove-orphans
 
-docker-dev: docker-down
-	docker compose -f docker-compose.dev.yml up --build
+dcup: dcdown
+	docker compose up --build
 
-docker-local: docker-down
-	docker compose -f docker-compose.local.yml up --build -d
+dcupd: dcdown
+	docker compose up --build -d
+

@@ -18,29 +18,33 @@ type RemoveBackgroundProcess struct {
 	storage      images.Storage
 }
 
-func (r *RemoveBackgroundProcess) Exec() (*entities.ImageProcess, error) {
+func (r *RemoveBackgroundProcess) Exec() (entities.ImageProcess, error) {
 	log.Debugw("starting remove background process", r.imageProcess)
 	r.imageProcess.StartProcess()
 
+	log.Debug("downloading original image")
 	if err := r.downloadImage(); err != nil {
-		return nil, r.handleError(err)
+		return r.imageProcess, r.handleError(err)
 	}
 
+	log.Debug("running command")
 	if err := r.runCommand(); err != nil {
-		return nil, r.handleError(err)
+		return r.imageProcess, r.handleError(err)
 	}
 
+	log.Debug("uploading result")
 	if err := r.uploadResultImage(); err != nil {
-		return nil, r.handleError(err)
+		return r.imageProcess, r.handleError(err)
 	}
 
+	log.Debug("finishing process")
 	if err := r.finish(); err != nil {
-		return nil, r.handleError(err)
+		return r.imageProcess, r.handleError(err)
 	}
 
 	go r.cleanup()
 
-	return &r.imageProcess, nil
+	return r.imageProcess, nil
 }
 
 func (r *RemoveBackgroundProcess) downloadImage() error {
@@ -87,6 +91,7 @@ func (r *RemoveBackgroundProcess) uploadResultImage() error {
 }
 
 func (r *RemoveBackgroundProcess) handleError(err error) error {
+	log.Errorw("remove background process error", err)
 	r.imageProcess.SetError(err)
 
 	return err
@@ -158,7 +163,7 @@ func (r *RemoveBackgroundProcess) runCommand() error {
 
 	err = command.Start()
 	if err != nil {
-		return nil
+		return err
 	}
 
 	return command.Wait()
@@ -169,22 +174,24 @@ func (r *RemoveBackgroundProcess) buildCommand() (*exec.Cmd, error) {
 		return nil, errors.New("RemoveBackgroundProcess.resultImage is empty")
 	}
 
-	workdir, err := os.Getwd()
+	imageLocalPath, err := r.buildFileLocalPath(r.imageProcess.Image.Filename())
 	if err != nil {
 		return nil, err
 	}
 
-	cmd := &exec.Cmd{
-		Path: "/bin/sh",
-		Args: []string{
-			"-c",
-			workdir + "/scripts/rembg/run.sh",
-			r.imageProcess.Image.Filename(),
-			r.imageProcess.Result.Filename(),
-		},
-		Stdout: os.Stdout,
-		Stderr: os.Stderr,
+	resultLocalPath, err := r.buildFileLocalPath(
+		r.imageProcess.Result.Filename(),
+	)
+	if err != nil {
+		return nil, err
 	}
+
+	cmd := exec.Command("rembg", "i",
+		imageLocalPath,
+		resultLocalPath,
+	)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 
 	return cmd, nil
 }

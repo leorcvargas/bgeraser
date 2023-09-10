@@ -5,6 +5,8 @@ package env
 import (
 	"fmt"
 	"os"
+
+	"github.com/gofiber/fiber/v2/log"
 )
 
 func GetEnvOrDie(key string) string {
@@ -12,7 +14,7 @@ func GetEnvOrDie(key string) string {
 
 	if value == "" {
 		err := fmt.Errorf("missing environment variable %s", key)
-		panic(err)
+		log.Fatal(err)
 	}
 
 	return value

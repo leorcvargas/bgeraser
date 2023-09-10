@@ -38,7 +38,7 @@ func (w Worker) Start() {
 
 			w.outQueue <- imageprocesses.ProcessOutJob{
 				Err:     err,
-				Payload: *imageProcess,
+				Payload: imageProcess,
 			}
 		}
 	}()
