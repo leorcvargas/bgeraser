@@ -27,6 +27,8 @@ COPY ./.env* .
 
 RUN pip3 install --no-cache-dir rembg[cli]
 
+RUN python -c 'from rembg.bg import download_models; download_models()'
+
 EXPOSE 8080
 
 CMD ["/bin/sh", "-c", "/server"]
