@@ -7,11 +7,13 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/csrf"
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/filesystem"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/requestid"
 
 	"github.com/leorcvargas/bgeraser/internal/infra/config"
@@ -39,14 +41,11 @@ func buildRouterConfig(config *config.Config) fiber.Config {
 
 func loadMiddlewares(r *fiber.App) {
 	// Security
-	// r.Use(recover.New())
-	// TODO uncomment later
-	// r.Use(csrf.New())
-
-	// TODO CONFIGURE THIS THING THE RIGHT WAY
+	r.Use(recover.New())
+	r.Use(csrf.New())
 	r.Use(cors.New(cors.Config{
 		AllowMethods: "*",
-		AllowOrigins: "*",
+		AllowOrigins: "https://kamui.app, https://www.kamui.app",
 	}))
 	r.Use(etag.New())
 	r.Use(helmet.New())
