@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"github.com/gofiber/fiber/v2/log"
@@ -11,14 +11,12 @@ import (
 	"github.com/leorcvargas/bgeraser/internal/infra/httpapi/controllers"
 	"github.com/leorcvargas/bgeraser/internal/infra/httpapi/routers"
 	"github.com/leorcvargas/bgeraser/internal/infra/storage"
-	processinworker "github.com/leorcvargas/bgeraser/internal/infra/worker/process_in"
-	processoutworker "github.com/leorcvargas/bgeraser/internal/infra/worker/process_out"
-
-	_ "go.uber.org/automaxprocs"
+	"github.com/leorcvargas/bgeraser/internal/producers"
+	"github.com/leorcvargas/bgeraser/internal/queues"
 	"go.uber.org/fx"
 )
 
-func main() {
+func Server() {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Warn("Couldn't load .env file")
@@ -33,9 +31,8 @@ func main() {
 		imageprocesses.Module,
 		httpapi.Module,
 		storage.Module,
-		processinworker.Module,
-		processoutworker.Module,
-		fx.NopLogger,
+		queues.Module,
+		producers.Module,
 	)
 
 	app.Run()

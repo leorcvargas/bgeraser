@@ -10,6 +10,7 @@ import (
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/leorcvargas/bgeraser/ent"
 	"github.com/leorcvargas/bgeraser/internal/infra/config"
+	"github.com/leorcvargas/bgeraser/internal/queues"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/valyala/fasthttp"
@@ -60,6 +61,7 @@ func NewServer(
 	router *fiber.App,
 	config *config.Config,
 	db *ent.Client,
+	queueConn queues.QueueConnection,
 ) *fasthttp.Server {
 	lifecycle.Append(fx.Hook{
 		OnStart: func(context.Context) error {
@@ -78,13 +80,13 @@ func NewServer(
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
-			defer func() {
-				if err := db.Close(); err != nil {
-					log.Warn("Error closing the database connection: %s", err)
-				}
-			}()
-
 			log.Info("Stopping the server...")
+
+			queueConn.Close()
+
+			if err := db.Close(); err != nil {
+				log.Warn("Error closing the database connection: %s", err)
+			}
 
 			return router.ShutdownWithContext(ctx)
 		},

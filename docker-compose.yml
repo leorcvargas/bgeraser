@@ -33,5 +33,11 @@ services:
       interval: 5s
       timeout: 25s
 
+  queues:
+    image: redis:latest
+    hostname: queues
+    ports:
+      - "6379:6379"
+
 volumes:
   postgres-db:

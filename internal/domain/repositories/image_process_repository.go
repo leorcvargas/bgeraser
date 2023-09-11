@@ -1,11 +1,11 @@
-package imageprocesses
+package repositories
 
 import (
 	"github.com/google/uuid"
 	"github.com/leorcvargas/bgeraser/internal/domain/entities"
 )
 
-type Repository interface {
+type ImageProcessRepository interface {
 	SaveProcess(process *entities.ImageProcess) error
 	UpdateProcessOnError(process *entities.ImageProcess) error
 	UpdateProcessOnSuccess(process *entities.ImageProcess) error

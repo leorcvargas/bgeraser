@@ -25,9 +25,9 @@ COPY ./data ./data
 
 COPY ./.env* .
 
-RUN pip3 install --no-cache-dir rembg[cli]
-
-RUN python -c 'from rembg.bg import download_models; download_models()'
+# RUN pip3 install --no-cache-dir rembg[cli]
+#
+# RUN python -c 'from rembg.bg import download_models; download_models()'
 
 EXPOSE 8080
 

@@ -1,6 +1,8 @@
 package config
 
-import "github.com/leorcvargas/bgeraser/pkg/env"
+import (
+	"github.com/leorcvargas/bgeraser/pkg/env"
+)
 
 type Config struct {
 	Database struct {
@@ -25,6 +27,10 @@ type Config struct {
 		Port     string
 		UseSonic bool
 		Prefork  bool
+	}
+	Queues struct {
+		Host string
+		Port string
 	}
 }
 
@@ -78,6 +84,14 @@ func NewConfig() *Config {
 			Region string
 		}{
 			Region: env.GetEnvOrDie("AWS_REGION"),
+		},
+
+		Queues: struct {
+			Host string
+			Port string
+		}{
+			Host: env.GetEnvOrDie("QUEUES_HOST"),
+			Port: env.GetEnvOrDie("QUEUES_PORT"),
 		},
 	}
 }
