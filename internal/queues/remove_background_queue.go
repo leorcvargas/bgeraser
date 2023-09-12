@@ -10,7 +10,10 @@ import (
 	"github.com/leorcvargas/bgeraser/internal/domain/entities"
 )
 
-const RemoveBackgroundQueueName = "remove_background"
+const (
+	RemoveBackgroundQueueName = "remove_background"
+	maxConsumers              = 2
+)
 
 type removeBackgroundQueue struct {
 	queue    rmq.Queue
@@ -27,13 +30,13 @@ func (r *removeBackgroundQueue) Publish(payload *entities.ImageProcess) error {
 }
 
 func (r *removeBackgroundQueue) StartConsumers() error {
-	err := r.queue.StartConsuming(2, time.Second)
+	err := r.queue.StartConsuming(1, time.Second)
 	if err != nil {
 		log.Fatalf("failed to start queue consumption: %v", err)
 		return nil
 	}
 
-	for i := 0; i < 4; i++ {
+	for i := 0; i < maxConsumers; i++ {
 		_, err = r.queue.AddConsumer(
 			fmt.Sprintf("%s-%d", RemoveBackgroundQueueName, i),
 			r.consumer,

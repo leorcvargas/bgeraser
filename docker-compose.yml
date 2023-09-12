@@ -15,8 +15,21 @@ services:
     expose:
       - 8080
 
+  worker:
+    build:
+      dockerfile: Dockerfile.worker
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      AWS_REGION: us-east-1
+      AWS_ACCESS_KEY_ID: "${AWS_ACCESS_KEY_ID}"
+      AWS_SECRET_ACCESS_KEY: "${AWS_SECRET_ACCESS_KEY}"
+    volumes:
+      - rembg-models:/root/.u2net
+
   db:
-    image: postgres:15
+    image: postgres:15-alpine
     hostname: db
     environment:
       POSTGRES_PASSWORD: postgres
@@ -34,10 +47,11 @@ services:
       timeout: 25s
 
   queues:
-    image: redis:latest
+    image: redis:alpine
     hostname: queues
     ports:
       - "6379:6379"
 
 volumes:
   postgres-db:
+  rembg-models:

@@ -42,9 +42,8 @@ func loadMiddlewares(r *fiber.App) {
 	// Security
 	r.Use(recover.New())
 	r.Use(cors.New(cors.Config{
-		AllowMethods:     "*",
-		AllowOrigins:     "https://kamui.app, https://www.kamui.app",
-		AllowCredentials: true,
+		AllowMethods: "*",
+		AllowOrigins: "https://kamui.app, https://www.kamui.app",
 	}))
 	r.Use(etag.New())
 	r.Use(helmet.New())

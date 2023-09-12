@@ -27,6 +27,7 @@ func Worker() {
 		storage.Module,
 		queues.Module,
 		fx.Invoke(func(queue queues.Queue[*entities.ImageProcess]) {
+			log.Info("Starting worker")
 			err := queue.StartConsumers()
 			if err != nil {
 				panic(err)

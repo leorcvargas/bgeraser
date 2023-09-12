@@ -12,10 +12,10 @@ COPY ./internal ./internal
 COPY ./ent ./ent
 COPY ./pkg ./pkg
 
-RUN go build -v -o ./bin/server ./cmd/server.go
+RUN go build -v -o ./bin/server ./cmd/server/server.go
 
 # Runtime
-FROM python:3.11-slim
+FROM alpine:3.18
 
 WORKDIR /
 
@@ -25,10 +25,6 @@ COPY ./data ./data
 
 COPY ./.env* .
 
-# RUN pip3 install --no-cache-dir rembg[cli]
-#
-# RUN python -c 'from rembg.bg import download_models; download_models()'
-
 EXPOSE 8080
 
-CMD ["/bin/sh", "-c", "/server"]
+CMD ["/server"]

@@ -1,6 +1,7 @@
 package imageprocesses
 
 import (
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/google/uuid"
 	"github.com/leorcvargas/bgeraser/internal/domain/entities"
 	"github.com/leorcvargas/bgeraser/internal/domain/repositories"
@@ -44,14 +45,24 @@ func (c *CreateProcess) Exec(
 }
 
 func (c *CreateProcess) save(process *entities.ImageProcess, errCh chan error) {
-	errCh <- c.repository.SaveProcess(process)
+	err := c.repository.SaveProcess(process)
+	if err != nil {
+		log.Errorf("failed to save process: %v", err)
+	}
+
+	errCh <- err
 }
 
 func (c *CreateProcess) publish(
 	process *entities.ImageProcess,
 	errCh chan error,
 ) {
-	errCh <- c.producer.Send(process)
+	err := c.producer.Send(process)
+	if err != nil {
+		log.Errorf("failed to enqueue process: %v", err)
+	}
+
+	errCh <- err
 }
 
 func NewCreateProcess(

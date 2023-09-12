@@ -3,7 +3,6 @@
 package database
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -32,12 +31,6 @@ func NewEntClient(cfg *config.Config) *ent.Client {
 
 	driver := entsql.OpenDB(dialect.Postgres, db)
 	client := ent.NewClient(ent.Driver(driver))
-
-	ctx := context.Background()
-	// Run the auto migration tool.
-	if err := client.Schema.Create(ctx); err != nil {
-		log.Fatalf("failed creating schema resources: %v", err)
-	}
 
 	return client
 }

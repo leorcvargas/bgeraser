@@ -17,7 +17,7 @@ dbuild:
 	docker build -t leorcvargas/bgeraser .
 
 dcdown:
-	docker compose down -v --remove-orphans
+	docker compose down --remove-orphans
 
 dcup: dcdown
 	docker compose up --build

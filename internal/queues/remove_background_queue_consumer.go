@@ -29,6 +29,7 @@ func NewRemoveBackgroundQueueConsumer(
 }
 
 func (r *removeBackgroundQueueConsumer) Consume(delivery rmq.Delivery) {
+	log.Infof("consuming: %v", delivery)
 	var imageProcess entities.ImageProcess
 
 	payload := delivery.Payload()
