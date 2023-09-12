@@ -23,6 +23,15 @@ services:
       - fromGroup: env-settings
     dockerfilePath: ./Dockerfile
 
+  # Worker
+  - type: worker
+    name: worker.queues
+    runtime: docker
+    plan: free
+    envVars:
+      - fromGroup: env-settings
+    dockerfilePath: ./Dockerfile.worker
+
 envVarGroups:
   # Environment
   - name: env-settings
