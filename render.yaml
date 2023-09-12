@@ -9,7 +9,7 @@ databases:
 services:
   - type: redis
     name: srv.redis.queues
-    plan: sfree
+    plan: free
     maxmemoryPolicy: noeviction
     ipAllowList: []
 
