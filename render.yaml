@@ -27,7 +27,7 @@ services:
   - type: worker
     name: worker.queues
     runtime: docker
-    plan: free
+    plan: starter
     envVars:
       - fromGroup: env-settings
     dockerfilePath: ./Dockerfile.worker
