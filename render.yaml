@@ -42,6 +42,8 @@ envVarGroups:
         value: 5432
       - key: DB_USER
         value: bgeraser
+      - key: DB_PASSWORD
+        sync: false
       - key: DB_NAME
         value: bgeraser
       - key: SERVER_PORT
