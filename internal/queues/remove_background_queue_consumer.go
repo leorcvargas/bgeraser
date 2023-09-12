@@ -29,18 +29,19 @@ func NewRemoveBackgroundQueueConsumer(
 }
 
 func (r *removeBackgroundQueueConsumer) Consume(delivery rmq.Delivery) {
-	log.Infof("consuming: %v", delivery)
+	log.Infof("consuming: %v")
+
 	var imageProcess entities.ImageProcess
 
-	payload := delivery.Payload()
-
-	unmarshalErr := sonic.Unmarshal([]byte(payload), &imageProcess)
+	unmarshalErr := sonic.Unmarshal([]byte(delivery.Payload()), &imageProcess)
 	if unmarshalErr != nil {
 		log.Errorf("failed to unmarshal payload: %v", unmarshalErr)
 		r.handleConsumeErr(unmarshalErr, delivery)
 
 		return
 	}
+
+	log.Infow("payload unmarshalled:", imageProcess)
 
 	execStepsErr := r.ExecSteps(imageProcess)
 	if execStepsErr != nil {
@@ -72,9 +73,12 @@ func (r *removeBackgroundQueueConsumer) ExecSteps(
 
 	var err error
 
-	for _, step := range steps {
+	for stepNumber, step := range steps {
+		log.Infof("executing step #%d", stepNumber)
+
 		stepErr := step(&imageProcess)
 		if stepErr != nil {
+			log.Errorf("step #%d failed: %v", stepNumber, stepErr)
 			imageProcess.SetError(stepErr)
 			err = stepErr
 		}
