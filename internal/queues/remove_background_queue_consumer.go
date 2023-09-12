@@ -81,14 +81,16 @@ func (r *removeBackgroundQueueConsumer) ExecSteps(
 			log.Errorf("step #%d failed: %v", stepNumber, stepErr)
 			imageProcess.SetError(stepErr)
 			err = stepErr
+			break
 		}
 	}
-	defer r.cleanup(&imageProcess)
 
 	if err != nil {
 		log.Errorf("remove background process error caught: %v", err)
 		return r.repository.UpdateProcessOnError(&imageProcess)
 	}
+
+	defer r.cleanup(&imageProcess)
 
 	return r.repository.UpdateProcessOnSuccess(&imageProcess)
 }

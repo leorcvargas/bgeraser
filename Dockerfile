@@ -11,6 +11,7 @@ COPY ./cmd ./cmd
 COPY ./internal ./internal
 COPY ./ent ./ent
 COPY ./pkg ./pkg
+COPY ./vendor ./vendor
 
 RUN go build -v -o ./bin/server ./cmd/server/server.go
 
