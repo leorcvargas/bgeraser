@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/gofiber/fiber/v2/log"
 	"github.com/leorcvargas/bgeraser/pkg/env"
 )
 
@@ -29,13 +30,15 @@ type Config struct {
 		Prefork  bool
 	}
 	Queues struct {
-		Host string
-		Port string
+		Host     string
+		Port     string
+		User     string
+		Password string
 	}
 }
 
 func NewConfig() *Config {
-	return &Config{
+	cfg := &Config{
 		Database: struct {
 			Host     string
 			Port     string
@@ -87,11 +90,19 @@ func NewConfig() *Config {
 		},
 
 		Queues: struct {
-			Host string
-			Port string
+			Host     string
+			Port     string
+			User     string
+			Password string
 		}{
-			Host: env.GetEnvOrDie("QUEUES_HOST"),
-			Port: env.GetEnvOrDie("QUEUES_PORT"),
+			Host:     env.GetEnvOrDie("QUEUES_HOST"),
+			Port:     env.GetEnvOrDie("QUEUES_PORT"),
+			User:     env.GetEnvOrDie("QUEUES_USER"),
+			Password: env.GetEnvOrDie("QUEUES_PASSWORD"),
 		},
 	}
+
+	log.Infow("Config loaded", cfg)
+
+	return cfg
 }

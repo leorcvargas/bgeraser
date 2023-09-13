@@ -6,6 +6,7 @@ import (
 	"github.com/adjust/rmq/v5"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/leorcvargas/bgeraser/internal/infra/config"
+	"github.com/redis/go-redis/v9"
 )
 
 type queueConnection struct {
@@ -27,11 +28,27 @@ func (q *queueConnection) Close() {
 }
 
 func (q *queueConnection) connect() (rmq.Connection, error) {
-	addr := fmt.Sprintf("%s:%s", q.config.Queues.Host, q.config.Queues.Port)
-
 	errCh := make(chan error)
 
-	conn, err := rmq.OpenConnection("bgeraser", "tcp", addr, 1, errCh)
+	addr := fmt.Sprintf(
+		"%s:%s",
+		q.config.Queues.Host,
+		q.config.Queues.Port,
+	)
+
+	rc := redis.NewClient(&redis.Options{
+		Addr:       addr,
+		Username:   q.config.Queues.User,
+		Password:   q.config.Queues.Password,
+		DB:         1,
+		ClientName: "bgeraser_client",
+	})
+
+	conn, err := rmq.OpenConnectionWithRedisClient(
+		"bgeraser",
+		rc,
+		errCh,
+	)
 	if err != nil {
 		close(errCh)
 		return nil, err

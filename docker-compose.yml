@@ -1,7 +1,9 @@
 version: "3.5"
 services:
   app:
-    build: .
+    build:
+      context: .
+      dockerfile: ./build/package/server/Dockerfile
     hostname: app
     depends_on:
       db:
@@ -17,7 +19,8 @@ services:
 
   worker:
     build:
-      dockerfile: Dockerfile.worker
+      context: .
+      dockerfile: ./build/package/worker/Dockerfile
     depends_on:
       db:
         condition: service_healthy

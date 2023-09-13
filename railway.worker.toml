@@ -1,0 +1,6 @@
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "./build/package/Dockerfile.worker"
+
+[deploy]
+restartPolicyType = "ON_FAILURE"

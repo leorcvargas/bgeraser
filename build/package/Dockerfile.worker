@@ -26,7 +26,6 @@ COPY ./data ./data
 
 COPY ./.env* .
 
-
 RUN pip install --upgrade pip
 RUN pip install rembg[cli]==2.0.50
 RUN python -c 'from rembg.bg import download_models; download_models()'
