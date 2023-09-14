@@ -1,8 +1,0 @@
-[build]
-builder = "DOCKERFILE"
-dockerfilePath = "./Dockerfile.server"
-
-[deploy]
-healthcheckPath = "/ping"
-healthcheckTimeout = 100
-restartPolicyType = "ON_FAILURE"
