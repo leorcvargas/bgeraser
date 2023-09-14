@@ -2,6 +2,7 @@ package queues
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/adjust/rmq/v5"
 	"github.com/gofiber/fiber/v2/log"
@@ -35,13 +36,14 @@ func (q *queueConnection) connect() (rmq.Connection, error) {
 		q.config.Queues.Host,
 		q.config.Queues.Port,
 	)
+	clientName := fmt.Sprintf("bgeraser_client_%d", time.Now().UnixNano())
 
 	rc := redis.NewClient(&redis.Options{
 		Addr:       addr,
 		Username:   q.config.Queues.User,
 		Password:   q.config.Queues.Password,
 		DB:         1,
-		ClientName: "bgeraser_client",
+		ClientName: clientName,
 	})
 
 	conn, err := rmq.OpenConnectionWithRedisClient(
