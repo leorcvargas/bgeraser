@@ -1,0 +1,6 @@
+[build]
+builder = "DOCKERFILE"
+
+[deploy]
+startCommand = "/worker"
+restartPolicyType = "ON_FAILURE"

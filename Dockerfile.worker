@@ -23,7 +23,7 @@ COPY --from=worker_builder /app/bin/worker .
 
 COPY ./data ./data
 
-COPY ./.env* .
+COPY ./railway.worker.toml ./railway.toml
 
 RUN pip install --upgrade pip
 RUN pip install rembg[cli]==2.0.50
