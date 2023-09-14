@@ -5,7 +5,7 @@ on:
     branches: main
 
 env:
-  REGISTRY_IMAGE: leorcvargas/bgeraser-worker
+  REGISTRY_IMAGE: ghcr.io/leorcvargas/bgeraser-worker
 
 jobs:
   build:
@@ -40,6 +40,7 @@ jobs:
         id: build
         uses: docker/build-push-action@v4
         with:
+          registry: ghcr.io
           context: .
           file: ./Dockerfile.worker
           platforms: ${{ matrix.platform }}
